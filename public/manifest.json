@@ -1,0 +1,20 @@
+{
+  "name": "יומן אישי",
+  "short_name": "יומן",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f5f1ed",
+  "theme_color": "#a3c9a8",
+  "icons": [
+    {
+      "src": "flowers.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "flowers.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
