@@ -1,0 +1,30 @@
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  font-family: "Arial", sans-serif;
+  background: #f5f1ed;
+  color: #333;
+  direction: rtl;
+}
+
+.App {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+  background-image: url('/flowers.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 30px 0;
+  border-radius: 12px;
+  color: #333;
+}
+
+.tabs {
+  margin-top: 12px;
+}
+.tabs button
