@@ -130,7 +130,7 @@
     background: transparent;
     border-radius: 12px;
     font-family: 'Assistant', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-light);
     cursor: pointer;
@@ -141,7 +141,7 @@
     color: var(--text-dark);
     box-shadow: 0 2px 8px rgba(100,80,60,0.12);
   }
-  .nav-tab .tab-icon { display: block; font-size: 15px; margin-bottom: 1px; }
+  .nav-tab .tab-icon { display: block; font-size: 16px; margin-bottom: 2px; }
 
   /* Sections */
   .section {
@@ -376,7 +376,7 @@
     color: var(--clay);
   }
   .stat-lbl {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-light);
     margin-top: 2px;
   }
@@ -643,7 +643,7 @@
     line-height: 1.2;
   }
   .date-nav-sub {
-    font-size: 11px;
+    font-size: 12px;
     color: rgba(255,255,255,0.7);
     margin-top: 1px;
   }
@@ -825,7 +825,7 @@
   }
   .apikey-save-btn:active { background: var(--moss); }
   .apikey-note {
-    font-size: 11px; color: var(--text-light); text-align: center; margin-top: 10px;
+    font-size: 12px; color: var(--text-light); text-align: center; margin-top: 10px;
   }
 
   /* AI settings row in security card */
@@ -851,7 +851,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     padding: 5px 10px;
     border-radius: 20px;
@@ -927,6 +927,89 @@
     cursor: pointer;
   }
 
+
+  /* ── Settings Drawer ── */
+  .drawer-overlay {
+    position: fixed; inset: 0; z-index: 1200;
+    background: rgba(58,48,40,0.4);
+    backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+  .drawer {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 82%; max-width: 320px;
+    background: var(--warm-white);
+    z-index: 1201;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
+    overflow-y: auto;
+    box-shadow: 4px 0 24px rgba(58,48,40,0.18);
+    display: flex; flex-direction: column;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+    padding: 52px 20px 20px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .drawer-header-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 20px; color: white;
+  }
+  .drawer-header-sub {
+    font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px;
+  }
+  .drawer-close {
+    position: absolute; top: 16px; left: 16px;
+    width: 32px; height: 32px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,0.2);
+    color: white; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .drawer-close:active { background: rgba(255,255,255,0.35); }
+
+  .drawer-body { padding: 16px; flex: 1; }
+
+  .drawer-section-title {
+    font-size: 12px; font-weight: 700; color: var(--text-light);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin: 16px 0 8px; padding-right: 4px;
+  }
+  .drawer-section-title:first-child { margin-top: 0; }
+
+  .drawer-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(100,80,60,0.06);
+    border: 1px solid rgba(200,185,165,0.25);
+  }
+  .drawer-card-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 14px; color: var(--text-mid);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 7px;
+  }
+
+  /* Hamburger button in header */
+  .header-menu-btn {
+    position: absolute; top: 18px; left: 16px;
+    width: 36px; height: 36px; border-radius: 10px;
+    border: none; background: rgba(255,255,255,0.2);
+    color: white; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+    z-index: 2;
+  }
+  .header-menu-btn:active { background: rgba(255,255,255,0.35); }
+
 </style>
 </head>
 <body>
@@ -965,6 +1048,7 @@
 
   <div class="header">
     <div class="header-leaf">🌿</div>
+    <button class="header-menu-btn" onclick="openDrawer()" aria-label="הגדרות">☰</button>
     <div class="header-date" id="headerDate"></div>
     <div class="header-title">היומן שלי</div>
     <div class="date-nav">
@@ -991,9 +1075,6 @@
     </button>
     <button class="nav-tab" onclick="showSection('thoughts', this)">
       <span class="tab-icon">💭</span>מחשבות
-    </button>
-    <button class="nav-tab" onclick="showSection('settings', this)">
-      <span class="tab-icon">⚙️</span>הגדרות
     </button>
   </div>
 
@@ -1131,11 +1212,23 @@
   </div>
 
   <!-- SETTINGS SECTION -->
-  <div class="section" id="section-settings">
-    <div class="card" id="firebaseCard">
-      <div class="card-title"><span class="icon">☁️</span> גיבוי ענן</div>
+
+</div><!-- end app-wrapper -->
+
+<!-- ── Settings Drawer ── -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="settingsDrawer">
+  <div class="drawer-header">
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    <div class="drawer-header-title">הגדרות</div>
+    <div class="drawer-header-sub">ענן, AI ואבטחה</div>
+  </div>
+  <div class="drawer-body">
+
+    <div class="drawer-section-title">☁️ גיבוי ענן</div>
+    <div class="drawer-card" id="firebaseCard">
       <div id="firebaseLoginArea">
-        <div style="font-size:13px;color:var(--text-mid);line-height:1.6;margin-bottom:8px">
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.6;margin-bottom:12px">
           התחבר עם Google כדי לגבות את היומן שלך בענן ולסנכרן בין מכשירים.
         </div>
         <button class="firebase-login-btn" onclick="firebaseSignIn()">
@@ -1152,28 +1245,30 @@
           </div>
           <button class="firebase-logout-btn" onclick="firebaseSignOut()">יציאה</button>
         </div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="change-pin-btn" style="flex:1;margin:0" onclick="manualCloudSync()">🔄 סנכרן עכשיו</button>
-          <button class="change-pin-btn" style="flex:1;margin:0" onclick="restoreFromCloud()">⬇️ שחזר מענן</button>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="change-pin-btn" style="flex:1;margin:0" onclick="manualCloudSync()">🔄 סנכרן</button>
+          <button class="change-pin-btn" style="flex:1;margin:0" onclick="restoreFromCloud()">⬇️ שחזר</button>
         </div>
       </div>
     </div>
-    <div class="card" style="margin-top:16px">
-      <div class="card-title"><span class="icon">🤖</span> בינה מלאכותית</div>
-      <div class="ai-settings-row">
+
+    <div class="drawer-section-title">🤖 בינה מלאכותית</div>
+    <div class="drawer-card">
+      <div class="ai-settings-row" style="margin-bottom:10px">
         <div style="font-size:13px;font-weight:600;color:var(--text-mid)">מפתח Anthropic API</div>
         <span class="ai-key-status" id="aiKeyStatus">לא מוגדר</span>
       </div>
-      <button class="change-pin-btn" style="margin-top:8px" onclick="openApiKeyModal()">🔑 הגדר API Key</button>
+      <button class="change-pin-btn" style="margin:0" onclick="openApiKeyModal()">🔑 הגדר API Key</button>
     </div>
-    <div class="card" style="margin-top:16px">
-      <div class="card-title"><span class="icon">🔒</span> אבטחה</div>
-      <button class="change-pin-btn" style="margin-bottom:8px" onclick="startChangePin()">🔑 שנה קוד PIN</button>
-      <button class="change-pin-btn" style="color:var(--clay);border-color:var(--clay-light)" onclick="removePin()">🗑 הסר קוד PIN</button>
-    </div>
-  </div>
 
-</div><!-- end app-wrapper -->
+    <div class="drawer-section-title">🔒 אבטחה</div>
+    <div class="drawer-card">
+      <button class="change-pin-btn" style="margin-bottom:8px" onclick="startChangePin()">🔑 שנה קוד PIN</button>
+      <button class="change-pin-btn" style="color:var(--clay);border-color:var(--clay-light);margin:0" onclick="removePin()">🗑 הסר קוד PIN</button>
+    </div>
+
+  </div>
+</div>
 
 <script>
 // ─── Date & Navigation ───────────────────────────────────
@@ -1810,6 +1905,29 @@ if (document.readyState === 'loading') {
 } else {
   initAI();
 }
+
+
+// ── Drawer ───────────────────────────────────────────────
+function openDrawer() {
+  document.getElementById('settingsDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('settingsDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Swipe left to close drawer
+(function() {
+  let startX = 0;
+  document.getElementById('settingsDrawer').addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  document.getElementById('settingsDrawer').addEventListener('touchend', e => {
+    if (startX - e.changedTouches[0].clientX > 60) closeDrawer();
+  }, { passive: true });
+})();
 
 // ── PIN / Lock ──────────────────────────────────────────
 const PIN_KEY = 'journal_pin';
