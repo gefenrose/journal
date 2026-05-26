@@ -443,6 +443,153 @@
   }
   .save-indicator.show { transform: translateX(-50%) translateY(0); }
 
+  /* ── Lock Screen ── */
+  #lockScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: linear-gradient(160deg, #e8e0d4 0%, #d8cfc0 50%, #cfc4b0 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  #lockScreen.unlocking {
+    opacity: 0;
+    transform: scale(1.04);
+    pointer-events: none;
+  }
+  #lockScreen.hidden { display: none; }
+
+  .lock-leaf {
+    font-size: 64px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 4px 12px rgba(100,80,60,0.18));
+    animation: sway 4s ease-in-out infinite;
+  }
+  @keyframes sway {
+    0%,100% { transform: rotate(-4deg); }
+    50% { transform: rotate(4deg); }
+  }
+
+  .lock-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 28px;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .lock-subtitle {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 36px;
+  }
+
+  /* PIN dots */
+  .pin-dots {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    direction: ltr;
+  }
+  .pin-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--sand-dark);
+    background: transparent;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .pin-dot.filled {
+    background: var(--sage-dark);
+    border-color: var(--sage-dark);
+    transform: scale(1.15);
+  }
+  .pin-dot.error {
+    background: var(--clay);
+    border-color: var(--clay);
+    animation: shake 0.35s ease;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  /* Numpad */
+  .numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 72px);
+    grid-template-rows: repeat(4, 72px);
+    gap: 12px;
+    direction: ltr;
+  }
+  .num-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(8px);
+    font-family: 'Secular One', sans-serif;
+    font-size: 22px;
+    color: var(--text-dark);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(100,80,60,0.1);
+    transition: background 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .num-btn:active { background: rgba(255,255,255,0.9); transform: scale(0.93); }
+  .num-btn.del-btn { font-size: 18px; background: rgba(196,133,90,0.15); }
+  .num-btn.empty-btn { background: transparent; box-shadow: none; pointer-events: none; }
+
+  .lock-error-msg {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--clay);
+    min-height: 18px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .lock-error-msg.show { opacity: 1; }
+
+  /* Setup screen */
+  .lock-setup-hint {
+    font-size: 13px;
+    color: var(--text-mid);
+    text-align: center;
+    margin-bottom: 28px;
+    line-height: 1.6;
+    max-width: 240px;
+  }
+
+  /* Change PIN button (inside app) */
+  .change-pin-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--sand-light);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 14px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-mid);
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+    margin-bottom: 10px;
+  }
+  .change-pin-btn:active { background: var(--sand-dark); }
+
   .section-save-btn {
     width: 100%;
     padding: 13px;
@@ -459,9 +606,154 @@
     letter-spacing: 0.02em;
   }
   .section-save-btn:active { background: var(--sage-light); transform: scale(0.98); }
+
+  /* ── Date Navigation ── */
+  .date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0,0,0,0.12);
+    border-radius: 14px;
+    margin-top: 14px;
+    padding: 6px 8px;
+  }
+  .date-nav-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.18);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+  .date-nav-btn:active { background: rgba(255,255,255,0.35); transform: scale(0.9); }
+  .date-nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .date-nav-center {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+  }
+  .date-nav-label {
+    font-family: 'Secular One', sans-serif;
+    font-size: 15px;
+    color: white;
+    line-height: 1.2;
+  }
+  .date-nav-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 1px;
+  }
+  .today-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 1px 7px;
+    font-size: 10px;
+    color: white;
+    margin-top: 2px;
+  }
+  /* date picker modal */
+  .datepicker-overlay {
+    position: fixed; inset: 0; z-index: 1500;
+    background: rgba(58,48,40,0.45);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .datepicker-overlay.open { opacity: 1; pointer-events: all; }
+  .datepicker-sheet {
+    width: 100%; max-width: 430px;
+    background: var(--warm-white);
+    border-radius: 24px 24px 0 0;
+    padding: 20px 20px 36px;
+    transform: translateY(40px);
+    transition: transform 0.3s cubic-bezier(0.34,1.3,0.64,1);
+  }
+  .datepicker-overlay.open .datepicker-sheet { transform: translateY(0); }
+  .datepicker-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .datepicker-title {
+    font-family: 'Secular One', sans-serif; font-size: 17px; color: var(--text-dark);
+  }
+  .datepicker-close {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: none; background: var(--sand-light); cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; color: var(--text-mid);
+  }
+  .month-nav {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+  }
+  .month-nav-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: var(--sand-light); cursor: pointer; font-size: 18px; color: var(--text-mid);
+    display: flex; align-items: center; justify-content: center; transition: background 0.15s;
+  }
+  .month-nav-btn:active { background: var(--sand-dark); }
+  .month-label { font-family: 'Secular One', sans-serif; font-size: 15px; color: var(--text-dark); }
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7,1fr); gap: 4px;
+  }
+  .cal-dow {
+    text-align: center; font-size: 11px; font-weight: 700; color: var(--text-light);
+    padding: 4px 0;
+  }
+  .cal-day {
+    aspect-ratio: 1; border-radius: 50%; border: none; background: transparent;
+    font-family: 'Assistant', sans-serif; font-size: 13px; color: var(--text-dark);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s; position: relative;
+  }
+  .cal-day:hover:not(:disabled) { background: var(--sand-light); }
+  .cal-day.today { border: 2px solid var(--sage); color: var(--sage-dark); font-weight: 700; }
+  .cal-day.selected { background: var(--sage-dark); color: white; border: none; }
+  .cal-day.has-entry::after {
+    content: '';
+    position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: var(--clay-light);
+  }
+  .cal-day.selected::after { background: rgba(255,255,255,0.6); }
+  .cal-day:disabled { opacity: 0.3; cursor: default; }
+  .cal-day.empty { pointer-events: none; }
+
 </style>
 </head>
 <body>
+<!-- ── Lock Screen ── -->
+<div id="lockScreen">
+  <div class="lock-leaf">🌿</div>
+  <div class="lock-title" id="lockTitle">היומן שלי</div>
+  <div class="lock-subtitle" id="lockSubtitle">הכנס קוד PIN</div>
+  <div class="lock-setup-hint" id="lockSetupHint" style="display:none"></div>
+  <div class="pin-dots" id="pinDots">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="numpad">
+    <button class="num-btn" onclick="pinPress('1')">1</button>
+    <button class="num-btn" onclick="pinPress('2')">2</button>
+    <button class="num-btn" onclick="pinPress('3')">3</button>
+    <button class="num-btn" onclick="pinPress('4')">4</button>
+    <button class="num-btn" onclick="pinPress('5')">5</button>
+    <button class="num-btn" onclick="pinPress('6')">6</button>
+    <button class="num-btn" onclick="pinPress('7')">7</button>
+    <button class="num-btn" onclick="pinPress('8')">8</button>
+    <button class="num-btn" onclick="pinPress('9')">9</button>
+    <div class="num-btn empty-btn"></div>
+    <button class="num-btn" onclick="pinPress('0')">0</button>
+    <button class="num-btn del-btn" onclick="pinDel()">⌫</button>
+  </div>
+  <div class="lock-error-msg" id="lockError"></div>
+</div>
+
 <div class="app-wrapper">
   <div class="save-indicator" id="saveIndicator">✓ נשמר בהצלחה</div>
 
@@ -469,7 +761,15 @@
     <div class="header-leaf">🌿</div>
     <div class="header-date" id="headerDate"></div>
     <div class="header-title">היומן שלי</div>
-    <div class="header-subtitle">רגע של שקט ומחשבה</div>
+    <div class="date-nav">
+      <button class="date-nav-btn" id="prevDayBtn" onclick="navigateDay(-1)" title="יום קודם">‹</button>
+      <div class="date-nav-center" onclick="openDatePicker()">
+        <div class="date-nav-label" id="navDayLabel"></div>
+        <div class="date-nav-sub" id="navDateSub"></div>
+        <div id="todayBadge" class="today-badge" style="display:none">היום</div>
+      </div>
+      <button class="date-nav-btn" id="nextDayBtn" onclick="navigateDay(1)" title="יום הבא">›</button>
+    </div>
   </div>
 
   <!-- Main Nav -->
@@ -588,20 +888,159 @@
       <div class="card-title"><span class="icon">💭</span> מחשבות חופשיות</div>
       <textarea class="journal-input" id="thoughts" rows="12" placeholder="כתוב/י כל מה שעולה לך בראש... אין כאן שיפוט."></textarea>
     </div>
+    <div class="card" style="margin-top:0">
+      <div class="card-title"><span class="icon">🔒</span> אבטחה</div>
+      <button class="change-pin-btn" onclick="startChangePin()">🔑 שנה קוד PIN</button>
+      <button class="change-pin-btn" style="color:var(--clay);border-color:var(--clay-light)" onclick="removePin()">🗑 הסר קוד PIN</button>
+    </div>
     <button class="section-save-btn" onclick="saveSection('thoughts')">💾 שמור מחשבות</button>
   </div>
 
 </div><!-- end app-wrapper -->
 
 <script>
-// ─── Date ───────────────────────────────────────────────
+// ─── Date & Navigation ───────────────────────────────────
 const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
 const months = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const now = new Date();
-document.getElementById('headerDate').textContent =
-  `יום ${days[now.getDay()]}, ${now.getDate()} ב${months[now.getMonth()]} ${now.getFullYear()}`;
+const shortMonths = ['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'];
 
-const todayKey = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+const _now = new Date();
+// viewDate = the date currently being viewed (may differ from today)
+let viewDate = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate());
+
+function dateToKey(d) {
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+function todayKey() { return dateToKey(new Date(_now.getFullYear(), _now.getMonth(), _now.getDate())); }
+function currentKey() { return dateToKey(viewDate); }
+function isToday() { return currentKey() === todayKey(); }
+
+function updateDateHeader() {
+  const d = viewDate;
+  document.getElementById('headerDate').textContent =
+    `יום ${days[d.getDay()]}, ${d.getDate()} ב${months[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('navDayLabel').textContent = `יום ${days[d.getDay()]}`;
+  document.getElementById('navDateSub').textContent =
+    `${d.getDate()} ${shortMonths[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('todayBadge').style.display = isToday() ? 'inline-block' : 'none';
+  // disable next button if already on today
+  document.getElementById('nextDayBtn').disabled = isToday();
+}
+
+function navigateDay(delta) {
+  saveCurrentDayQuiet();
+  const d = new Date(viewDate);
+  d.setDate(d.getDate() + delta);
+  // Don't go into the future beyond today
+  const today = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate());
+  if (d > today) return;
+  viewDate = d;
+  updateDateHeader();
+  loadDay();
+  renderGraph(currentPeriod);
+}
+
+function saveCurrentDayQuiet() {
+  // Silently save all fields for current day before switching
+  const store = getStore();
+  const day = store[currentKey()] || {};
+  ['grat1','grat2','grat3','rem1','rem2','rem3','thoughts'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) day[id] = el.value;
+  });
+  for (let h = 6; h <= 22; h++) {
+    const el = document.getElementById('hour_'+h);
+    if (el) day['hour_'+h] = el.value;
+  }
+  store[currentKey()] = day;
+  setStore(store);
+}
+
+// ── Calendar picker ──
+let calViewYear, calViewMonth;
+
+function openDatePicker() {
+  calViewYear = viewDate.getFullYear();
+  calViewMonth = viewDate.getMonth();
+  renderCalendar();
+  document.getElementById('datepickerOverlay').classList.add('open');
+}
+function closeDatePicker() {
+  document.getElementById('datepickerOverlay').classList.remove('open');
+}
+function closeDatePickerOutside(e) {
+  if (e.target === document.getElementById('datepickerOverlay')) closeDatePicker();
+}
+function calPrevMonth() {
+  calViewMonth--;
+  if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  renderCalendar();
+}
+function calNextMonth() {
+  const today = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate());
+  // Don't go past current month
+  if (calViewYear === today.getFullYear() && calViewMonth >= today.getMonth()) return;
+  calViewMonth++;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  renderCalendar();
+}
+function renderCalendar() {
+  const today = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate());
+  const store = getStore();
+  const label = document.getElementById('calMonthLabel');
+  label.textContent = `${months[calViewMonth]} ${calViewYear}`;
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  // Day-of-week headers (Sun first in Hebrew)
+  ['א','ב','ג','ד','ה','ו','ש'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(calViewYear, calViewMonth, 1).getDay(); // 0=Sun
+  // Empty cells before first
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('button');
+    el.className = 'cal-day empty'; el.disabled = true;
+    grid.appendChild(el);
+  }
+
+  const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const btn = document.createElement('button');
+    btn.className = 'cal-day';
+    btn.textContent = d;
+    const thisDate = new Date(calViewYear, calViewMonth, d);
+    const key = dateToKey(thisDate);
+
+    if (thisDate > today) { btn.disabled = true; }
+    if (key === dateToKey(today)) btn.classList.add('today');
+    if (key === currentKey()) btn.classList.add('selected');
+    if (store[key] && Object.keys(store[key]).some(k => store[key][k])) btn.classList.add('has-entry');
+
+    btn.onclick = () => {
+      saveCurrentDayQuiet();
+      viewDate = new Date(calViewYear, calViewMonth, d);
+      updateDateHeader();
+      loadDay();
+      renderGraph(currentPeriod);
+      closeDatePicker();
+    };
+    grid.appendChild(btn);
+  }
+  // disable next-month button if already at current month
+  const nextMonthBtn = document.querySelector('.month-nav-btn:last-child');
+  if (nextMonthBtn) {
+    nextMonthBtn.disabled = (calViewYear === today.getFullYear() && calViewMonth >= today.getMonth());
+  }
+}
+
+// init
+updateDateHeader();
 
 // ─── Mood labels ────────────────────────────────────────
 const moodLabels = {
@@ -656,10 +1095,10 @@ function setStore(d) {
 
 function loadDay() {
   const store = getStore();
-  const day = store[todayKey] || {};
+  const day = store[currentKey()] || {};
   ['grat1','grat2','grat3','rem1','rem2','rem3','thoughts'].forEach(id => {
     const el = document.getElementById(id);
-    if (el && day[id]) el.value = day[id];
+    if (el) el.value = day[id] || '';
   });
   for (let h = 6; h <= 22; h++) {
     const el = document.getElementById('hour_' + h);
@@ -668,6 +1107,9 @@ function loadDay() {
   if (day.mood) {
     document.getElementById('moodSlider').value = day.mood;
     updateMood(day.mood);
+  } else {
+    document.getElementById('moodSlider').value = 5;
+    updateMood(5);
   }
 }
 
@@ -680,7 +1122,7 @@ function showToast(msg) {
 
 function saveSection(section) {
   const store = getStore();
-  const day = store[todayKey] || {};
+  const day = store[currentKey()] || {};
   if (section === 'today') {
     ['grat1','grat2','grat3','rem1','rem2','rem3'].forEach(id => {
       const el = document.getElementById(id);
@@ -694,7 +1136,7 @@ function saveSection(section) {
   } else if (section === 'thoughts') {
     day.thoughts = document.getElementById('thoughts').value;
   }
-  store[todayKey] = day;
+  store[currentKey()] = day;
   setStore(store);
   showToast('✓ נשמר בהצלחה');
 }
@@ -702,9 +1144,9 @@ function saveSection(section) {
 function saveMood() {
   const val = parseInt(document.getElementById('moodSlider').value);
   const store = getStore();
-  const day = store[todayKey] || {};
+  const day = store[currentKey()] || {};
   day.mood = val;
-  store[todayKey] = day;
+  store[currentKey()] = day;
   setStore(store);
   showToast('✓ מצב רוח נשמר');
   renderGraph(currentPeriod);
@@ -895,6 +1337,154 @@ function renderGraph(period) {
   });
 }
 
+
+// ── PIN / Lock ──────────────────────────────────────────
+const PIN_KEY = 'journal_pin';
+const SESSION_KEY = 'journal_unlocked';
+
+let pinBuffer = '';
+let pinMode = 'unlock'; // unlock | setup1 | setup2
+let pinTemp = '';
+
+function hashPin(pin) {
+  // Simple but sufficient: store as base64 of reversed string + salt
+  return btoa('jrnl:' + pin.split('').reverse().join('') + ':2024');
+}
+
+function getStoredPin() { return localStorage.getItem(PIN_KEY); }
+function setStoredPin(h) { localStorage.setItem(PIN_KEY, h); }
+function removeStoredPin() { localStorage.removeItem(PIN_KEY); }
+
+function initLock() {
+  const stored = getStoredPin();
+  const sessionOk = sessionStorage.getItem(SESSION_KEY) === '1';
+
+  if (!stored) {
+    // First launch — setup PIN
+    pinMode = 'setup1';
+    document.getElementById('lockSubtitle').textContent = 'בחר קוד PIN בן 4 ספרות';
+    document.getElementById('lockSetupHint').style.display = 'block';
+    document.getElementById('lockSetupHint').textContent = 'קוד PIN מגן על היומן שלך. בחר 4 ספרות שתזכור.';
+    document.getElementById('lockTitle').textContent = 'ברוך/ה הבא/ה';
+  } else if (sessionOk) {
+    // Already unlocked this session
+    unlock(false);
+    return;
+  } else {
+    pinMode = 'unlock';
+    document.getElementById('lockSubtitle').textContent = 'הכנס קוד PIN';
+  }
+}
+
+function pinPress(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updateDots();
+  if (pinBuffer.length === 4) {
+    setTimeout(() => handleFullPin(), 120);
+  }
+}
+
+function pinDel() {
+  if (pinBuffer.length === 0) return;
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinBuffer.length);
+    document.getElementById('d' + i).classList.remove('error');
+  }
+}
+
+function handleFullPin() {
+  if (pinMode === 'unlock') {
+    const stored = getStoredPin();
+    if (hashPin(pinBuffer) === stored) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      unlock(true);
+    } else {
+      showPinError('קוד שגוי, נסה שוב');
+    }
+  } else if (pinMode === 'setup1') {
+    pinTemp = pinBuffer;
+    pinBuffer = '';
+    pinMode = 'setup2';
+    document.getElementById('lockSubtitle').textContent = 'אמת את הקוד';
+    document.getElementById('lockSetupHint').textContent = 'הכנס שוב את הקוד לאימות.';
+    updateDots();
+  } else if (pinMode === 'setup2') {
+    if (pinBuffer === pinTemp) {
+      setStoredPin(hashPin(pinBuffer));
+      sessionStorage.setItem(SESSION_KEY, '1');
+      unlock(true);
+    } else {
+      showPinError('הקודים אינם תואמים, התחל מחדש');
+      pinMode = 'setup1';
+      pinTemp = '';
+      setTimeout(() => {
+        document.getElementById('lockSubtitle').textContent = 'בחר קוד PIN בן 4 ספרות';
+      }, 1200);
+    }
+  }
+}
+
+function showPinError(msg) {
+  const dots = document.querySelectorAll('.pin-dot');
+  dots.forEach(d => { d.classList.remove('filled'); d.classList.add('error'); });
+  const err = document.getElementById('lockError');
+  err.textContent = msg;
+  err.classList.add('show');
+  setTimeout(() => {
+    dots.forEach(d => d.classList.remove('error'));
+    err.classList.remove('show');
+    pinBuffer = '';
+    updateDots();
+  }, 1200);
+}
+
+function unlock(animate) {
+  const ls = document.getElementById('lockScreen');
+  if (animate) {
+    ls.classList.add('unlocking');
+    setTimeout(() => ls.classList.add('hidden'), 400);
+  } else {
+    ls.classList.add('hidden');
+  }
+}
+
+function startChangePin() {
+  pinBuffer = '';
+  pinTemp = '';
+  pinMode = 'setup1';
+  document.getElementById('lockTitle').textContent = 'שנה קוד PIN';
+  document.getElementById('lockSubtitle').textContent = 'בחר קוד חדש';
+  document.getElementById('lockSetupHint').style.display = 'block';
+  document.getElementById('lockSetupHint').textContent = 'הכנס קוד PIN חדש בן 4 ספרות.';
+  document.getElementById('lockError').classList.remove('show');
+  updateDots();
+  const ls = document.getElementById('lockScreen');
+  ls.classList.remove('hidden', 'unlocking');
+}
+
+function removePin() {
+  if (!confirm('האם להסיר את קוד ה-PIN? היומן לא יהיה מוגן יותר.')) return;
+  removeStoredPin();
+  sessionStorage.removeItem(SESSION_KEY);
+  showToast('🔓 קוד PIN הוסר');
+}
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  const ls = document.getElementById('lockScreen');
+  if (ls.classList.contains('hidden')) return;
+  if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+  if (e.key === 'Backspace') pinDel();
+});
+
+initLock();
+
 // ─── Init ────────────────────────────────────────────────
 loadDay();
 setTimeout(() => renderGraph('week'), 100);
@@ -903,16 +1493,16 @@ setTimeout(() => renderGraph('week'), 100);
 document.querySelectorAll('.journal-input, .hour-input').forEach(el => {
   el.addEventListener('blur', () => {
     const store = getStore();
-    const day = store[todayKey] || {};
+    const day = store[currentKey()] || {};
     if (el.id) day[el.id] = el.value;
-    store[todayKey] = day;
+    store[currentKey()] = day;
     setStore(store);
   });
 });
 </script>
 
 <script>
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.hostname.includes('claudeusercontent')) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
       .then(reg => console.log('SW registered:', reg.scope))
@@ -920,5 +1510,22 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<!-- Date Picker Modal -->
+<div class="datepicker-overlay" id="datepickerOverlay" onclick="closeDatePickerOutside(event)">
+  <div class="datepicker-sheet">
+    <div class="datepicker-header">
+      <div class="datepicker-title">בחר תאריך</div>
+      <button class="datepicker-close" onclick="closeDatePicker()">✕</button>
+    </div>
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="calPrevMonth()">›</button>
+      <div class="month-label" id="calMonthLabel"></div>
+      <button class="month-nav-btn" onclick="calNextMonth()">‹</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+</div>
+
 </body>
 </html>
