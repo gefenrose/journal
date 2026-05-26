@@ -125,12 +125,12 @@
   }
   .nav-tab {
     flex: 1;
-    padding: 8px 4px;
+    padding: 8px 2px;
     border: none;
     background: transparent;
     border-radius: 12px;
     font-family: 'Assistant', sans-serif;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text-light);
     cursor: pointer;
@@ -141,7 +141,7 @@
     color: var(--text-dark);
     box-shadow: 0 2px 8px rgba(100,80,60,0.12);
   }
-  .nav-tab .tab-icon { display: block; font-size: 16px; margin-bottom: 2px; }
+  .nav-tab .tab-icon { display: block; font-size: 15px; margin-bottom: 1px; }
 
   /* Sections */
   .section {
@@ -203,7 +203,7 @@
     border-radius: 4px;
     outline: none;
     cursor: pointer;
-    background: linear-gradient(to left, var(--clay), var(--lavender), var(--sky));
+    background: linear-gradient(to right, var(--clay), var(--lavender), var(--sky));
   }
   .mood-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -992,6 +992,9 @@
     <button class="nav-tab" onclick="showSection('thoughts', this)">
       <span class="tab-icon">💭</span>מחשבות
     </button>
+    <button class="nav-tab" onclick="showSection('settings', this)">
+      <span class="tab-icon">⚙️</span>הגדרות
+    </button>
   </div>
 
   <!-- TODAY SECTION -->
@@ -1124,7 +1127,12 @@
       </div>
       <div class="ai-response-text" id="aiWriteText"></div>
     </div>
-    <div class="card" style="margin-top:12px" id="firebaseCard">
+    <button class="section-save-btn" onclick="saveSection('thoughts')">💾 שמור מחשבות</button>
+  </div>
+
+  <!-- SETTINGS SECTION -->
+  <div class="section" id="section-settings">
+    <div class="card" id="firebaseCard">
       <div class="card-title"><span class="icon">☁️</span> גיבוי ענן</div>
       <div id="firebaseLoginArea">
         <div style="font-size:13px;color:var(--text-mid);line-height:1.6;margin-bottom:8px">
@@ -1150,17 +1158,19 @@
         </div>
       </div>
     </div>
-    <div class="card" style="margin-top:12px">
-      <div class="card-title"><span class="icon">🔒</span> אבטחה</div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title"><span class="icon">🤖</span> בינה מלאכותית</div>
       <div class="ai-settings-row">
-        <div style="font-size:13px;font-weight:600;color:var(--text-mid)">🤖 מפתח Anthropic API</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text-mid)">מפתח Anthropic API</div>
         <span class="ai-key-status" id="aiKeyStatus">לא מוגדר</span>
       </div>
-      <button class="change-pin-btn" style="margin-bottom:8px" onclick="openApiKeyModal()">🔑 הגדר API Key</button>
-      <button class="change-pin-btn" onclick="startChangePin()">🔑 שנה קוד PIN</button>
+      <button class="change-pin-btn" style="margin-top:8px" onclick="openApiKeyModal()">🔑 הגדר API Key</button>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title"><span class="icon">🔒</span> אבטחה</div>
+      <button class="change-pin-btn" style="margin-bottom:8px" onclick="startChangePin()">🔑 שנה קוד PIN</button>
       <button class="change-pin-btn" style="color:var(--clay);border-color:var(--clay-light)" onclick="removePin()">🗑 הסר קוד PIN</button>
     </div>
-    <button class="section-save-btn" onclick="saveSection('thoughts')">💾 שמור מחשבות</button>
   </div>
 
 </div><!-- end app-wrapper -->
