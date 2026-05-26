@@ -722,6 +722,211 @@
   .cal-day:disabled { opacity: 0.3; cursor: default; }
   .cal-day.empty { pointer-events: none; }
 
+
+  /* ── AI Integration ── */
+  .ai-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, var(--sage-light), var(--sky-light));
+    border: none; border-radius: 20px;
+    font-family: 'Assistant', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--moss); cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 10px;
+  }
+  .ai-btn:active { opacity: 0.8; transform: scale(0.97); }
+  .ai-btn:disabled { opacity: 0.5; cursor: default; }
+  .ai-btn .ai-spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(107,124,90,0.3);
+    border-top-color: var(--moss);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .ai-btn.loading .ai-spinner { display: block; }
+  .ai-btn.loading .ai-btn-icon { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ai-response-card {
+    background: linear-gradient(135deg, #f0ebe3, #e8f0e4);
+    border: 1.5px solid var(--sage-light);
+    border-radius: 18px;
+    padding: 16px;
+    margin-top: 12px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+  }
+  .ai-response-card.visible { display: block; }
+  .ai-response-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .ai-response-title {
+    font-family: 'Secular One', sans-serif; font-size: 13px; color: var(--sage-dark);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ai-response-close {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: none; background: rgba(0,0,0,0.08); cursor: pointer;
+    font-size: 12px; color: var(--text-mid);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ai-response-text {
+    font-size: 14px; color: var(--text-dark); line-height: 1.7;
+    white-space: pre-wrap;
+  }
+  .ai-response-text .typing-cursor {
+    display: inline-block; width: 2px; height: 15px;
+    background: var(--sage-dark); margin-right: 2px;
+    vertical-align: middle;
+    animation: blink 0.8s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* API key setup modal */
+  .apikey-overlay {
+    position: fixed; inset: 0; z-index: 1500;
+    background: rgba(58,48,40,0.5); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+  .apikey-overlay.open { opacity: 1; pointer-events: all; }
+  .apikey-sheet {
+    width: 100%; max-width: 380px;
+    background: var(--warm-white); border-radius: 24px; padding: 28px 24px;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.34,1.3,0.64,1);
+  }
+  .apikey-overlay.open .apikey-sheet { transform: scale(1); }
+  .apikey-title {
+    font-family: 'Secular One', sans-serif; font-size: 20px; color: var(--text-dark);
+    margin-bottom: 8px;
+  }
+  .apikey-desc {
+    font-size: 13px; color: var(--text-light); line-height: 1.6; margin-bottom: 18px;
+  }
+  .apikey-desc a { color: var(--sage-dark); }
+  .apikey-input {
+    width: 100%; padding: 12px 14px;
+    background: var(--sand-light); border: 1.5px solid var(--sand-dark);
+    border-radius: 12px; font-family: 'Assistant', sans-serif; font-size: 13px;
+    color: var(--text-dark); direction: ltr; text-align: left; outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 12px;
+  }
+  .apikey-input:focus { border-color: var(--sage); }
+  .apikey-save-btn {
+    width: 100%; padding: 13px; background: var(--sage-dark); color: white;
+    border: none; border-radius: 14px; font-family: 'Assistant', sans-serif;
+    font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s;
+  }
+  .apikey-save-btn:active { background: var(--moss); }
+  .apikey-note {
+    font-size: 11px; color: var(--text-light); text-align: center; margin-top: 10px;
+  }
+
+  /* AI settings row in security card */
+  .ai-settings-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--sand-light);
+  }
+  .ai-settings-row:last-child { border-bottom: none; }
+  .ai-key-status {
+    font-size: 12px; padding: 3px 10px; border-radius: 10px;
+    font-weight: 600;
+  }
+  .ai-key-status.set { background: #d4edda; color: #4a7a5a; }
+  .ai-key-status.unset { background: #f8d7da; color: #a05050; }
+
+
+  /* ── Cloud Sync ── */
+  .cloud-status {
+    position: fixed;
+    top: 14px;
+    left: 16px;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: rgba(253,249,244,0.92);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(100,80,60,0.12);
+    transition: all 0.3s ease;
+    color: var(--text-light);
+  }
+  .cloud-status .cs-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--sand-dark);
+    transition: background 0.3s;
+  }
+  .cloud-status.syncing .cs-dot {
+    background: var(--sky);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  .cloud-status.synced .cs-dot { background: var(--sage); }
+  .cloud-status.error .cs-dot { background: var(--clay); }
+  .cloud-status.offline .cs-dot { background: var(--sand-dark); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Firebase setup card */
+  .firebase-setup-card {
+    background: linear-gradient(135deg, #e8f0e4, #e4ecf0);
+    border: 1.5px solid var(--sage-light);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .firebase-setup-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 14px; color: var(--sage-dark); margin-bottom: 6px;
+  }
+  .firebase-login-btn {
+    width: 100%; padding: 12px;
+    background: white;
+    border: 1.5px solid var(--sage-light);
+    border-radius: 14px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--text-dark);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(100,80,60,0.08);
+    margin-top: 8px;
+  }
+  .firebase-login-btn:active { background: var(--sand-light); }
+  .firebase-user-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0;
+  }
+  .firebase-user-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--sage-light); overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .firebase-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .firebase-user-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+  .firebase-user-email { font-size: 11px; color: var(--text-light); }
+  .firebase-logout-btn {
+    margin-right: auto;
+    padding: 5px 12px;
+    background: transparent;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: 10px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 12px; font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+  }
+
 </style>
 </head>
 <body>
@@ -756,6 +961,7 @@
 
 <div class="app-wrapper">
   <div class="save-indicator" id="saveIndicator">✓ נשמר בהצלחה</div>
+  <div class="cloud-status offline" id="cloudStatus"><div class="cs-dot"></div><span id="cloudStatusText">לא מחובר</span></div>
 
   <div class="header">
     <div class="header-leaf">🌿</div>
@@ -825,6 +1031,16 @@
     </div>
 
     <button class="section-save-btn" onclick="saveSection('today')">💾 שמור את היום</button>
+    <button class="ai-btn" id="aiReflectBtn" onclick="aiReflect()">
+      <span class="ai-btn-icon">✨</span><div class="ai-spinner"></div> רפלקציה יומית
+    </button>
+    <div class="ai-response-card" id="aiReflectCard">
+      <div class="ai-response-header">
+        <div class="ai-response-title">✨ Claude מגיב</div>
+        <button class="ai-response-close" onclick="closeAiCard('aiReflectCard')">✕</button>
+      </div>
+      <div class="ai-response-text" id="aiReflectText"></div>
+    </div>
   </div>
 
   <!-- MOOD SECTION -->
@@ -871,6 +1087,16 @@
         </div>
       </div>
     </div>
+    <button class="ai-btn" id="aiMoodBtn" onclick="aiMoodInsight()">
+      <span class="ai-btn-icon">🧠</span><div class="ai-spinner"></div> ניתוח מצב רוח
+    </button>
+    <div class="ai-response-card" id="aiMoodCard">
+      <div class="ai-response-header">
+        <div class="ai-response-title">🧠 תובנות Claude</div>
+        <button class="ai-response-close" onclick="closeAiCard('aiMoodCard')">✕</button>
+      </div>
+      <div class="ai-response-text" id="aiMoodText"></div>
+    </div>
   </div>
 
   <!-- HOURS SECTION -->
@@ -888,8 +1114,49 @@
       <div class="card-title"><span class="icon">💭</span> מחשבות חופשיות</div>
       <textarea class="journal-input" id="thoughts" rows="12" placeholder="כתוב/י כל מה שעולה לך בראש... אין כאן שיפוט."></textarea>
     </div>
-    <div class="card" style="margin-top:0">
+    <button class="ai-btn" id="aiWriteBtn" onclick="aiWritingAssist()">
+      <span class="ai-btn-icon">✍️</span><div class="ai-spinner"></div> עזרה בכתיבה
+    </button>
+    <div class="ai-response-card" id="aiWriteCard">
+      <div class="ai-response-header">
+        <div class="ai-response-title">✍️ הצעות Claude</div>
+        <button class="ai-response-close" onclick="closeAiCard('aiWriteCard')">✕</button>
+      </div>
+      <div class="ai-response-text" id="aiWriteText"></div>
+    </div>
+    <div class="card" style="margin-top:12px" id="firebaseCard">
+      <div class="card-title"><span class="icon">☁️</span> גיבוי ענן</div>
+      <div id="firebaseLoginArea">
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.6;margin-bottom:8px">
+          התחבר עם Google כדי לגבות את היומן שלך בענן ולסנכרן בין מכשירים.
+        </div>
+        <button class="firebase-login-btn" onclick="firebaseSignIn()">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.3 0 24 0 14.6 0 6.6 5.5 2.6 13.5l7.8 6C12.4 13.3 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8C43.8 37.3 46.5 31.4 46.5 24.5z"/><path fill="#FBBC05" d="M10.4 28.5c-.6-1.6-.9-3.3-.9-5s.3-3.4.9-5l-7.8-6C.9 15.5 0 19.6 0 24s.9 8.5 2.6 12l7.8-6z"/><path fill="#34A853" d="M24 48c6.3 0 11.6-2.1 15.5-5.6l-7.5-5.8c-2.1 1.4-4.8 2.2-8 2.2-6.2 0-11.5-3.8-13.6-9.3l-7.8 6C6.6 42.5 14.6 48 24 48z"/></svg>
+          התחבר עם Google
+        </button>
+      </div>
+      <div id="firebaseUserArea" style="display:none">
+        <div class="firebase-user-row">
+          <div class="firebase-user-avatar" id="firebaseAvatar">👤</div>
+          <div>
+            <div class="firebase-user-name" id="firebaseUserName"></div>
+            <div class="firebase-user-email" id="firebaseUserEmail"></div>
+          </div>
+          <button class="firebase-logout-btn" onclick="firebaseSignOut()">יציאה</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="change-pin-btn" style="flex:1;margin:0" onclick="manualCloudSync()">🔄 סנכרן עכשיו</button>
+          <button class="change-pin-btn" style="flex:1;margin:0" onclick="restoreFromCloud()">⬇️ שחזר מענן</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
       <div class="card-title"><span class="icon">🔒</span> אבטחה</div>
+      <div class="ai-settings-row">
+        <div style="font-size:13px;font-weight:600;color:var(--text-mid)">🤖 מפתח Anthropic API</div>
+        <span class="ai-key-status" id="aiKeyStatus">לא מוגדר</span>
+      </div>
+      <button class="change-pin-btn" style="margin-bottom:8px" onclick="openApiKeyModal()">🔑 הגדר API Key</button>
       <button class="change-pin-btn" onclick="startChangePin()">🔑 שנה קוד PIN</button>
       <button class="change-pin-btn" style="color:var(--clay);border-color:var(--clay-light)" onclick="removePin()">🗑 הסר קוד PIN</button>
     </div>
@@ -1086,14 +1353,15 @@ for (let h = 6; h <= 22; h++) {
 }
 
 // ─── Storage helpers ─────────────────────────────────────
-function getStore() {
+window.getStore = function getStore() {
   try { return JSON.parse(localStorage.getItem('journal') || '{}'); } catch { return {}; }
 }
-function setStore(d) {
+window.setStore = function setStore(d) {
   try { localStorage.setItem('journal', JSON.stringify(d)); } catch {}
+  if (window.scheduleCloudSync) window.scheduleCloudSync();
 }
 
-function loadDay() {
+window.loadDay = function loadDay() {
   const store = getStore();
   const day = store[currentKey()] || {};
   ['grat1','grat2','grat3','rem1','rem2','rem3','thoughts'].forEach(id => {
@@ -1195,7 +1463,7 @@ function getWeeklyAvgPerMonth() {
   };
 }
 
-function renderGraph(period) {
+window.renderGraph = function renderGraph(period) {
   const store = getStore();
   let labels = [], data = [];
 
@@ -1337,6 +1605,201 @@ function renderGraph(period) {
   });
 }
 
+
+
+// ── AI Integration ──────────────────────────────────────
+
+const AI_KEY_STORE = 'journal_ai_key';
+
+function getApiKey() {
+  try { return localStorage.getItem(AI_KEY_STORE) || ''; } catch { return ''; }
+}
+function setApiKey(k) {
+  try { localStorage.setItem(AI_KEY_STORE, k); } catch {}
+}
+
+function openApiKeyModal() {
+  const k = getApiKey();
+  document.getElementById('apikeyInput').value = k ? '••••••••••••' : '';
+  document.getElementById('apikeyOverlay').classList.add('open');
+}
+function closeApiKeyModal() {
+  document.getElementById('apikeyOverlay').classList.remove('open');
+}
+function saveApiKey() {
+  const v = document.getElementById('apikeyInput').value.trim();
+  if (v && !v.startsWith('•')) setApiKey(v);
+  updateAiKeyStatus();
+  closeApiKeyModal();
+  showToast('✓ API Key נשמר');
+}
+function updateAiKeyStatus() {
+  const el = document.getElementById('aiKeyStatus');
+  if (!el) return;
+  const has = !!getApiKey();
+  el.textContent = has ? 'מוגדר ✓' : 'לא מוגדר';
+  el.className = 'ai-key-status ' + (has ? 'set' : 'unset');
+}
+
+function closeAiCard(id) {
+  document.getElementById(id).classList.remove('visible');
+}
+
+async function callClaude(prompt, btnId, cardId, textId) {
+  const key = getApiKey();
+  if (!key) { openApiKeyModal(); return; }
+
+  const btn = document.getElementById(btnId);
+  const card = document.getElementById(cardId);
+  const textEl = document.getElementById(textId);
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+  card.classList.add('visible');
+  textEl.innerHTML = '<span class="typing-cursor"></span>';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        stream: true,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `שגיאה ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    textEl.innerHTML = '<span class="typing-cursor"></span>';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6);
+        if (data === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            fullText += parsed.delta.text;
+            textEl.innerHTML = fullText.replace(/\n/g, '<br>') + '<span class="typing-cursor"></span>';
+          }
+        } catch {}
+      }
+    }
+    textEl.innerHTML = fullText.replace(/\n/g, '<br>');
+
+  } catch (e) {
+    textEl.innerHTML = `<span style="color:var(--clay)">שגיאה: ${e.message}</span>`;
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function aiReflect() {
+  const store = getStore();
+  const day = store[currentKey()] || {};
+  const g = [day.grat1, day.grat2, day.grat3].filter(Boolean).join(', ');
+  const r = [day.rem1, day.rem2, day.rem3].filter(Boolean).join(', ');
+  const mood = day.mood ? `${day.mood}/9 (${moodLabels[day.mood]})` : 'לא צוין';
+
+  if (!g && !r) { showToast('כתוב קודם משהו ביומן'); return; }
+
+  const prompt = `אתה עוזר יומן אישי חם ותומך. המשתמש כתב ביומן שלו בעברית:
+
+הכרת תודה: ${g || 'לא מולא'}
+דברים לזכור: ${r || 'לא מולא'}
+מצב רוח: ${mood}
+תאריך: ${currentKey()}
+
+תפקידך: כתוב רפלקציה קצרה ומעוררת מחשבה בעברית (4-6 משפטים). שים לב לדפוסים חיוביים, שאל שאלה מעמיקה אחת שתעזור למשתמש לצמוח, והוסף עידוד. אל תהיה גנרי - התייחס לתוכן הספציפי. כתוב ישירות אל המשתמש (גוף שני).`;
+
+  callClaude(prompt, 'aiReflectBtn', 'aiReflectCard', 'aiReflectText');
+}
+
+function aiWritingAssist() {
+  const thoughts = document.getElementById('thoughts').value.trim();
+  if (!thoughts) { showToast('כתוב קודם מחשבות'); return; }
+
+  const prompt = `אתה עוזר כתיבה יומנית יצירתי. המשתמש כתב בעברית:
+
+"${thoughts}"
+
+תפקידך: עזור להעמיק ולהרחיב את הכתיבה. תן 2-3 הצעות קצרות:
+1. משפט או שניים שמרחיבים רעיון מרכזי
+2. שאלה שאפשר להוסיף לחקור
+3. ניסוח אחר של רגש שעלה
+
+היה קצר, ספציפי, ובעברית טבעית. אל תחזור על מה שנכתב - הוסף ערך.`;
+
+  callClaude(prompt, 'aiWriteBtn', 'aiWriteCard', 'aiWriteText');
+}
+
+function aiMoodInsight() {
+  const store = getStore();
+  const dates = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(_now); d.setDate(d.getDate() - i);
+    const k = dateToKey(d);
+    if (store[k]?.mood) dates.push({ date: k, mood: store[k].mood });
+  }
+
+  if (dates.length < 3) { showToast('צריך לפחות 3 ימים עם נתוני מצב רוח'); return; }
+
+  const moodSeries = dates.map(d => `${d.date}: ${d.mood}`).join(', ');
+  const avg = (dates.reduce((a,b) => a + b.mood, 0) / dates.length).toFixed(1);
+  const max = Math.max(...dates.map(d => d.mood));
+  const min = Math.min(...dates.map(d => d.mood));
+  const todayMood = store[currentKey()]?.mood;
+
+  const prompt = `אתה פסיכולוג יומנית תומך ומקצועי. אתה רואה נתוני מצב רוח של 30 יום אחרונים (סקאלה 1-9: 1=דיכאוני, 5=מאוזן, 9=מאני):
+
+${moodSeries}
+
+ממוצע: ${avg}, גבוה: ${max}, נמוך: ${min}
+מצב רוח היום: ${todayMood ? moodLabels[todayMood] : 'לא נמדד'}
+
+כתוב ניתוח תמציתי בעברית (5-7 משפטים):
+- תאר טרנדים שאתה רואה בנתונים
+- ציין ימים/תקופות בולטות
+- תן תובנה אחת משמעותית
+- הצע המלצה פרקטית אחת
+
+היה אמפתי ומבוסס על הנתונים. אל תאבחן - אתה עוזר לחשיבה עצמית.`;
+
+  callClaude(prompt, 'aiMoodBtn', 'aiMoodCard', 'aiMoodText');
+}
+
+// Close modal on outside click + init AI (safe for any DOM state)
+function initAI() {
+  const overlay = document.getElementById('apikeyOverlay');
+  if (overlay) overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeApiKeyModal();
+  });
+  updateAiKeyStatus();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAI);
+} else {
+  initAI();
+}
 
 // ── PIN / Lock ──────────────────────────────────────────
 const PIN_KEY = 'journal_pin';
@@ -1486,19 +1949,26 @@ document.addEventListener('keydown', e => {
 initLock();
 
 // ─── Init ────────────────────────────────────────────────
-loadDay();
-setTimeout(() => renderGraph('week'), 100);
+function initApp() {
+  loadDay();
+  setTimeout(() => renderGraph('week'), 100);
 
-// Auto-save on blur
-document.querySelectorAll('.journal-input, .hour-input').forEach(el => {
-  el.addEventListener('blur', () => {
-    const store = getStore();
-    const day = store[currentKey()] || {};
-    if (el.id) day[el.id] = el.value;
-    store[currentKey()] = day;
-    setStore(store);
+  // Auto-save on blur
+  document.querySelectorAll('.journal-input, .hour-input').forEach(el => {
+    el.addEventListener('blur', () => {
+      const store = getStore();
+      const day = store[currentKey()] || {};
+      if (el.id) day[el.id] = el.value;
+      store[currentKey()] = day;
+      setStore(store);
+    });
   });
-});
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 </script>
 
 <script>
@@ -1509,6 +1979,161 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.
       .catch(err => console.log('SW error:', err));
   });
 }
+</script>
+
+<script type="module">
+// ── Firebase Cloud Sync ──────────────────────────────────
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDjUYvdYXvseu1B0LlLctOHtZVcORuAEhM",
+  authDomain: "gefenrose-journal.firebaseapp.com",
+  projectId: "gefenrose-journal",
+  storageBucket: "gefenrose-journal.firebasestorage.app",
+  messagingSenderId: "484476221811",
+  appId: "1:484476221811:web:309ca260b852a672162d06"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+let currentUser = null;
+let syncTimeout = null;
+
+function setCloudStatus(state, text) {
+  const el = document.getElementById('cloudStatus');
+  const txt = document.getElementById('cloudStatusText');
+  if (!el) return;
+  el.className = 'cloud-status ' + state;
+  txt.textContent = text;
+}
+
+// Expose functions to global scope for onclick handlers
+window.firebaseSignIn = async () => {
+  try {
+    setCloudStatus('syncing', 'מתחבר...');
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    console.error('Login error:', e);
+    setCloudStatus('error', 'שגיאת התחברות');
+    setTimeout(() => setCloudStatus('offline', 'לא מחובר'), 3000);
+  }
+};
+
+window.firebaseSignOut = async () => {
+  await signOut(auth);
+  setCloudStatus('offline', 'לא מחובר');
+};
+
+window.manualCloudSync = async () => {
+  if (!currentUser) return;
+  await pushToCloud(true);
+};
+
+window.restoreFromCloud = async () => {
+  if (!currentUser) return;
+  setCloudStatus('syncing', 'משחזר...');
+  try {
+    const snap = await getDocs(collection(db, 'users', currentUser.uid, 'journal'));
+    const merged = window.getStore ? window.getStore() : {};
+    snap.forEach(d => { merged[d.id] = { ...merged[d.id], ...d.data() }; });
+    if (window.setStore) window.setStore(merged);
+    if (window.loadDay) window.loadDay();
+    if (window.renderGraph) window.renderGraph(window.currentPeriod || 'week');
+    setCloudStatus('synced', 'שוחזר ✓');
+    if (window.showToast) window.showToast('⬇️ שוחזר מהענן');
+    setTimeout(() => setCloudStatus('synced', 'מסונכרן ✓'), 2000);
+  } catch (e) {
+    console.error('Restore error:', e);
+    setCloudStatus('error', 'שגיאת שחזור');
+    setTimeout(() => setCloudStatus('synced', 'מחובר'), 3000);
+  }
+};
+
+async function pushToCloud(manual = false) {
+  if (!currentUser) return;
+  setCloudStatus('syncing', 'שומר...');
+  try {
+    const store = window.getStore ? window.getStore() : {};
+    const batch = Object.entries(store);
+    await Promise.all(batch.map(([key, val]) =>
+      setDoc(doc(db, 'users', currentUser.uid, 'journal', key), val, { merge: true })
+    ));
+    setCloudStatus('synced', 'מסונכרן ✓');
+    if (manual && window.showToast) window.showToast('☁️ נשמר בענן');
+  } catch (e) {
+    console.error('Sync error:', e);
+    setCloudStatus('error', 'שגיאת סנכרון');
+    setTimeout(() => setCloudStatus('synced', 'מחובר'), 4000);
+  }
+}
+
+// Auto-sync after any save (debounced 2s)
+window.scheduleCloudSync = () => {
+  if (!currentUser) return;
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(() => pushToCloud(false), 2000);
+};
+
+// Auth state listener
+onAuthStateChanged(auth, async user => {
+  currentUser = user;
+  const loginArea = document.getElementById('firebaseLoginArea');
+  const userArea = document.getElementById('firebaseUserArea');
+
+  if (user) {
+    // Update UI
+    if (loginArea) loginArea.style.display = 'none';
+    if (userArea) userArea.style.display = 'block';
+    const nameEl = document.getElementById('firebaseUserName');
+    const emailEl = document.getElementById('firebaseUserEmail');
+    const avatarEl = document.getElementById('firebaseAvatar');
+    if (nameEl) nameEl.textContent = user.displayName || 'משתמש';
+    if (emailEl) emailEl.textContent = user.email || '';
+    if (avatarEl && user.photoURL) {
+      avatarEl.innerHTML = `<img src="${user.photoURL}" alt="">`;
+    }
+    setCloudStatus('syncing', 'מסנכרן...');
+
+    // Merge cloud → local on login
+    try {
+      const snap = await getDocs(collection(db, 'users', user.uid, 'journal'));
+      const local = window.getStore ? window.getStore() : {};
+      let changed = false;
+      snap.forEach(d => {
+        const cloudDay = d.data();
+        if (!local[d.id]) { local[d.id] = cloudDay; changed = true; }
+        else {
+          // Merge: cloud wins for fields that are empty locally
+          Object.keys(cloudDay).forEach(k => {
+            if (!local[d.id][k] && cloudDay[k]) { local[d.id][k] = cloudDay[k]; changed = true; }
+          });
+        }
+      });
+      if (changed) {
+        if (window.setStore) window.setStore(local);
+        if (window.loadDay) window.loadDay();
+        if (window.renderGraph) window.renderGraph(window.currentPeriod || 'week');
+      }
+      setCloudStatus('synced', 'מסונכרן ✓');
+      // Also push local to cloud
+      await pushToCloud(false);
+    } catch(e) {
+      console.error(e);
+      setCloudStatus('error', 'שגיאת סנכרון');
+    }
+  } else {
+    if (loginArea) loginArea.style.display = 'block';
+    if (userArea) userArea.style.display = 'none';
+    setCloudStatus('offline', 'לא מחובר');
+  }
+});
 </script>
 
 <!-- Date Picker Modal -->
@@ -1524,6 +2149,23 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.
       <button class="month-nav-btn" onclick="calNextMonth()">‹</button>
     </div>
     <div class="cal-grid" id="calGrid"></div>
+  </div>
+</div>
+
+
+<!-- API Key Modal -->
+<div class="apikey-overlay" id="apikeyOverlay">
+  <div class="apikey-sheet">
+    <div class="apikey-title">🤖 Anthropic API Key</div>
+    <div class="apikey-desc">
+      כדי להפעיל את תכונות ה-AI, הכנס מפתח API מ-<a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.<br><br>
+      המפתח נשמר רק במכשיר שלך ולא נשלח לשום שרת אחר.
+    </div>
+    <input class="apikey-input" id="apikeyInput" type="password"
+      placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+    <button class="apikey-save-btn" onclick="saveApiKey()">שמור ✓</button>
+    <button class="apikey-save-btn" style="background:var(--sand-dark);color:var(--text-mid);margin-top:8px" onclick="closeApiKeyModal()">ביטול</button>
+    <div class="apikey-note">המפתח מוצפן ב-localStorage של הדפדפן שלך בלבד</div>
   </div>
 </div>
 
