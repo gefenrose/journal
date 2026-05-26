@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>יומן אישי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="היומן שלי">
+<meta name="theme-color" content="#7a8f6a">
+<meta name="description" content="יומן אישי עם מעקב מצב רוח">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+<style>
+  :root {
+    --sand: #e8dcc8;
+    --sand-light: #f4ede0;
+    --sand-dark: #d4c4a8;
+    --sage: #9aab89;
+    --sage-light: #b8c9a8;
+    --sage-dark: #7a8f6a;
+    --clay: #c4855a;
+    --clay-light: #d4a07a;
+    --clay-dark: #a06840;
+    --moss: #6b7c5a;
+    --cream: #faf6ef;
+    --warm-white: #fdf9f4;
+    --text-dark: #3a3028;
+    --text-mid: #6b5d50;
+    --text-light: #9a8878;
+    --sky: #a8bfc9;
+    --sky-light: #c4d8e2;
+    --lavender: #b8aac8;
+    --rose: #d4a8a8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Assistant', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* Texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app-wrapper {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--warm-white);
+    box-shadow: 0 0 40px rgba(100,80,60,0.1);
+    position: relative;
+    z-index: 1;
+    padding-bottom: 80px;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+    padding: 28px 24px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0; right: 0;
+    height: 40px;
+    background: var(--warm-white);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  .header-date {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .header-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 26px;
+    color: white;
+    letter-spacing: -0.01em;
+  }
+  .header-subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 2px;
+  }
+  .header-leaf {
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 80px;
+    opacity: 0.12;
+    transform: rotate(20deg);
+  }
+
+  /* Nav tabs */
+  .nav-tabs {
+    display: flex;
+    background: var(--sand-light);
+    padding: 6px;
+    margin: 24px 16px 0;
+    border-radius: 16px;
+    gap: 4px;
+  }
+  .nav-tab {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    background: transparent;
+    border-radius: 12px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .nav-tab.active {
+    background: white;
+    color: var(--text-dark);
+    box-shadow: 0 2px 8px rgba(100,80,60,0.12);
+  }
+  .nav-tab .tab-icon { display: block; font-size: 16px; margin-bottom: 2px; }
+
+  /* Sections */
+  .section {
+    display: none;
+    padding: 16px;
+    animation: fadeIn 0.3s ease;
+  }
+  .section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Cards */
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(100,80,60,0.07);
+    border: 1px solid rgba(200,185,165,0.3);
+  }
+  .card-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 15px;
+    color: var(--text-mid);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon { font-size: 18px; }
+
+  /* Mood Slider */
+  .mood-card { background: linear-gradient(135deg, #f0ebe3 0%, #e8e0d5 100%); }
+  .mood-value-display {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .mood-number {
+    font-family: 'Secular One', sans-serif;
+    font-size: 52px;
+    line-height: 1;
+    color: var(--clay);
+    transition: color 0.3s;
+  }
+  .mood-label {
+    font-size: 14px;
+    color: var(--text-mid);
+    margin-top: 4px;
+    min-height: 20px;
+  }
+  .slider-container { position: relative; padding: 8px 0; }
+  .mood-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(to left, var(--clay), var(--lavender), var(--sky));
+  }
+  .mood-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--clay);
+    box-shadow: 0 2px 8px rgba(100,80,60,0.25);
+    cursor: pointer;
+    transition: border-color 0.3s, transform 0.15s;
+  }
+  .mood-slider:active::-webkit-slider-thumb { transform: scale(1.15); }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-light);
+    margin-top: 6px;
+    padding: 0 2px;
+  }
+  .save-mood-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    background: var(--sage);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+  .save-mood-btn:active { background: var(--sage-dark); transform: scale(0.98); }
+
+  /* Text inputs */
+  .journal-input {
+    width: 100%;
+    background: var(--sand-light);
+    border: 1.5px solid transparent;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    direction: rtl;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    line-height: 1.6;
+  }
+  .journal-input:focus {
+    border-color: var(--sage-light);
+    background: white;
+  }
+  .journal-input::placeholder { color: var(--text-light); }
+
+  /* Numbered items */
+  .numbered-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .item-num {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--sage-light);
+    color: var(--moss);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  .item-num.clay-num { background: var(--clay-light); color: white; }
+  .item-num.sky-num { background: var(--sky-light); color: var(--text-mid); }
+
+  /* Hour list */
+  .hour-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--sand-light);
+  }
+  .hour-row:last-child { border-bottom: none; }
+  .hour-label {
+    min-width: 48px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-align: center;
+    background: var(--sand-light);
+    border-radius: 8px;
+    padding: 4px 6px;
+  }
+  .hour-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    font-family: 'Assistant', sans-serif;
+    font-size: 13px;
+    color: var(--text-dark);
+    direction: rtl;
+    outline: none;
+    padding: 4px 0;
+  }
+  .hour-input::placeholder { color: var(--text-light); }
+  .hour-input:focus { border-bottom: 1.5px solid var(--sage-light); }
+
+  /* Graph */
+  .graph-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .graph-tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--sand-dark);
+    background: transparent;
+    font-family: 'Assistant', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .graph-tab.active {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+  .graph-canvas-wrap {
+    position: relative;
+    height: 200px;
+    background: var(--sand-light);
+    border-radius: 16px;
+    overflow: hidden;
+    padding: 12px 16px 24px;
+  }
+  canvas#moodChart {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .stat-box {
+    flex: 1;
+    background: var(--sand-light);
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Secular One', sans-serif;
+    font-size: 22px;
+    color: var(--clay);
+  }
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 2px;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(253,249,244,0.96);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(200,185,165,0.3);
+    display: flex;
+    z-index: 100;
+  }
+  .bottom-btn {
+    flex: 1;
+    padding: 12px 4px 16px;
+    border: none;
+    background: transparent;
+    font-family: 'Assistant', sans-serif;
+    font-size: 10px;
+    color: var(--text-light);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    transition: color 0.2s;
+  }
+  .bottom-btn .b-icon { font-size: 22px; }
+  .bottom-btn.active { color: var(--sage-dark); }
+
+  /* Empty graph message */
+  .empty-graph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-light);
+    font-size: 13px;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Save indicator */
+  .save-indicator {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-60px);
+    background: var(--sage-dark);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 999;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+  }
+  .save-indicator.show { transform: translateX(-50%) translateY(0); }
+
+  .section-save-btn {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: var(--sage-dark);
+    border: 2px solid var(--sage-light);
+    border-radius: 14px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+  .section-save-btn:active { background: var(--sage-light); transform: scale(0.98); }
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+  <div class="save-indicator" id="saveIndicator">✓ נשמר בהצלחה</div>
+
+  <div class="header">
+    <div class="header-leaf">🌿</div>
+    <div class="header-date" id="headerDate"></div>
+    <div class="header-title">היומן שלי</div>
+    <div class="header-subtitle">רגע של שקט ומחשבה</div>
+  </div>
+
+  <!-- Main Nav -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('today', this)">
+      <span class="tab-icon">☀️</span>היום
+    </button>
+    <button class="nav-tab" onclick="showSection('mood', this)">
+      <span class="tab-icon">🌊</span>מצב רוח
+    </button>
+    <button class="nav-tab" onclick="showSection('hours', this)">
+      <span class="tab-icon">🕐</span>שעות
+    </button>
+    <button class="nav-tab" onclick="showSection('thoughts', this)">
+      <span class="tab-icon">💭</span>מחשבות
+    </button>
+  </div>
+
+  <!-- TODAY SECTION -->
+  <div class="section active" id="section-today">
+    <!-- Gratitude -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🌸</span> שלושה דברים שאני אסיר/ה תודה עליהם</div>
+      <div class="numbered-item">
+        <div class="item-num">1</div>
+        <textarea class="journal-input" id="grat1" rows="2" placeholder="משהו קטן או גדול שמשמח אותך..."></textarea>
+      </div>
+      <div class="numbered-item">
+        <div class="item-num">2</div>
+        <textarea class="journal-input" id="grat2" rows="2" placeholder="אדם, רגע, תחושה..."></textarea>
+      </div>
+      <div class="numbered-item">
+        <div class="item-num">3</div>
+        <textarea class="journal-input" id="grat3" rows="2" placeholder="משהו שלקחת לרשות עצמך..."></textarea>
+      </div>
+    </div>
+
+    <!-- Remember -->
+    <div class="card">
+      <div class="card-title"><span class="icon">📌</span> שלושה דברים לזכור היום</div>
+      <div class="numbered-item">
+        <div class="item-num clay-num">1</div>
+        <input class="journal-input" id="rem1" type="text" placeholder="משימה, פגישה, מסר חשוב...">
+      </div>
+      <div class="numbered-item">
+        <div class="item-num clay-num">2</div>
+        <input class="journal-input" id="rem2" type="text" placeholder="">
+      </div>
+      <div class="numbered-item">
+        <div class="item-num clay-num">3</div>
+        <input class="journal-input" id="rem3" type="text" placeholder="">
+      </div>
+    </div>
+
+    <button class="section-save-btn" onclick="saveSection('today')">💾 שמור את היום</button>
+  </div>
+
+  <!-- MOOD SECTION -->
+  <div class="section" id="section-mood">
+    <div class="card mood-card">
+      <div class="card-title"><span class="icon">🌊</span> איך אתה/את מרגיש/ה עכשיו?</div>
+      <div class="mood-value-display">
+        <div class="mood-number" id="moodNum">5</div>
+        <div class="mood-label" id="moodLabel">מאוזן/ת</div>
+      </div>
+      <div class="slider-container">
+        <input type="range" class="mood-slider" id="moodSlider" min="1" max="9" value="5" oninput="updateMood(this.value)">
+        <div class="slider-labels">
+          <span>דיכאוני (1)</span>
+          <span>מאניה (9)</span>
+        </div>
+      </div>
+      <button class="save-mood-btn" onclick="saveMood()">✓ שמור מצב רוח</button>
+    </div>
+
+    <!-- Graph -->
+    <div class="card">
+      <div class="card-title"><span class="icon">📈</span> מגמת מצב הרוח</div>
+      <div class="graph-tabs">
+        <button class="graph-tab active" onclick="changeGraphPeriod('week', this)">שבוע</button>
+        <button class="graph-tab" onclick="changeGraphPeriod('month', this)">חודש</button>
+        <button class="graph-tab" onclick="changeGraphPeriod('year', this)">שנה</button>
+      </div>
+      <div class="graph-canvas-wrap">
+        <canvas id="moodChart"></canvas>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-val" id="statAvg">-</div>
+          <div class="stat-lbl">ממוצע</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statHigh">-</div>
+          <div class="stat-lbl">גבוה</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statLow">-</div>
+          <div class="stat-lbl">נמוך</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOURS SECTION -->
+  <div class="section" id="section-hours">
+    <div class="card">
+      <div class="card-title"><span class="icon">🗓️</span> תכנון שעתי</div>
+      <div id="hourList"></div>
+    </div>
+    <button class="section-save-btn" onclick="saveSection('hours')">💾 שמור תכנון</button>
+  </div>
+
+  <!-- THOUGHTS SECTION -->
+  <div class="section" id="section-thoughts">
+    <div class="card">
+      <div class="card-title"><span class="icon">💭</span> מחשבות חופשיות</div>
+      <textarea class="journal-input" id="thoughts" rows="12" placeholder="כתוב/י כל מה שעולה לך בראש... אין כאן שיפוט."></textarea>
+    </div>
+    <button class="section-save-btn" onclick="saveSection('thoughts')">💾 שמור מחשבות</button>
+  </div>
+
+</div><!-- end app-wrapper -->
+
+<script>
+// ─── Date ───────────────────────────────────────────────
+const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const months = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const now = new Date();
+document.getElementById('headerDate').textContent =
+  `יום ${days[now.getDay()]}, ${now.getDate()} ב${months[now.getMonth()]} ${now.getFullYear()}`;
+
+const todayKey = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+
+// ─── Mood labels ────────────────────────────────────────
+const moodLabels = {
+  1: 'דיכאוני/ת מאוד 😶‍🌫️',
+  2: 'עצוב/ה 😔',
+  3: 'קצת מדוכדך/ת 😕',
+  4: 'נמוך/ה קצת 😐',
+  5: 'מאוזן/ת ✨',
+  6: 'סביר, בסדר 🙂',
+  7: 'טוב/ה 😊',
+  8: 'נמרץ/ת מאוד ⚡',
+  9: 'מאני/ת 🔥'
+};
+const moodColors = {
+  1:'#9b8fcc',2:'#a89ec8',3:'#b0abc0',4:'#c4b8a8',
+  5:'#9aab89',6:'#8da882',7:'#7a9f7a',8:'#d4a07a',9:'#c4855a'
+};
+
+function updateMood(val) {
+  document.getElementById('moodNum').textContent = val;
+  document.getElementById('moodLabel').textContent = moodLabels[val] || '';
+  document.getElementById('moodNum').style.color = moodColors[val] || '#c4855a';
+  document.querySelector('.mood-slider').style.setProperty('--thumb-color', moodColors[val]);
+}
+
+// ─── Nav ─────────────────────────────────────────────────
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── Hours ───────────────────────────────────────────────
+const hourList = document.getElementById('hourList');
+for (let h = 6; h <= 22; h++) {
+  const label = h < 12 ? `${h}:00` : h === 12 ? '12:00' : `${h}:00`;
+  const row = document.createElement('div');
+  row.className = 'hour-row';
+  row.innerHTML = `<div class="hour-label">${label}</div>
+    <input class="hour-input" id="hour_${h}" type="text" placeholder="...">`;
+  hourList.appendChild(row);
+}
+
+// ─── Storage helpers ─────────────────────────────────────
+function getStore() {
+  try { return JSON.parse(localStorage.getItem('journal') || '{}'); } catch { return {}; }
+}
+function setStore(d) {
+  try { localStorage.setItem('journal', JSON.stringify(d)); } catch {}
+}
+
+function loadDay() {
+  const store = getStore();
+  const day = store[todayKey] || {};
+  ['grat1','grat2','grat3','rem1','rem2','rem3','thoughts'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && day[id]) el.value = day[id];
+  });
+  for (let h = 6; h <= 22; h++) {
+    const el = document.getElementById('hour_' + h);
+    if (el && day['hour_'+h]) el.value = day['hour_'+h];
+  }
+  if (day.mood) {
+    document.getElementById('moodSlider').value = day.mood;
+    updateMood(day.mood);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('saveIndicator');
+  t.textContent = msg || '✓ נשמר';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function saveSection(section) {
+  const store = getStore();
+  const day = store[todayKey] || {};
+  if (section === 'today') {
+    ['grat1','grat2','grat3','rem1','rem2','rem3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) day[id] = el.value;
+    });
+  } else if (section === 'hours') {
+    for (let h = 6; h <= 22; h++) {
+      const el = document.getElementById('hour_'+h);
+      if (el) day['hour_'+h] = el.value;
+    }
+  } else if (section === 'thoughts') {
+    day.thoughts = document.getElementById('thoughts').value;
+  }
+  store[todayKey] = day;
+  setStore(store);
+  showToast('✓ נשמר בהצלחה');
+}
+
+function saveMood() {
+  const val = parseInt(document.getElementById('moodSlider').value);
+  const store = getStore();
+  const day = store[todayKey] || {};
+  day.mood = val;
+  store[todayKey] = day;
+  setStore(store);
+  showToast('✓ מצב רוח נשמר');
+  renderGraph(currentPeriod);
+}
+
+// ─── Graph ───────────────────────────────────────────────
+let currentPeriod = 'week';
+let chartInstance = null;
+
+function changeGraphPeriod(period, btn) {
+  currentPeriod = period;
+  document.querySelectorAll('.graph-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGraph(period);
+}
+
+function getDatesBack(n) {
+  const dates = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    dates.push(`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`);
+  }
+  return dates;
+}
+
+function getWeeklyAvgPerMonth() {
+  const store = getStore();
+  const months = {};
+  Object.entries(store).forEach(([k, v]) => {
+    if (!v.mood) return;
+    const [y, m] = k.split('-');
+    const key = `${y}-${m}`;
+    if (!months[key]) months[key] = [];
+    months[key].push(v.mood);
+  });
+  const sorted = Object.keys(months).sort().slice(-12);
+  return {
+    labels: sorted.map(k => {
+      const [y, m] = k.split('-');
+      return `${['ינו','פבר','מרץ','אפר','מאי','יוני','יולי','אוג','ספט','אוק','נוב','דצמ'][parseInt(m)-1]} ${y.slice(2)}`;
+    }),
+    data: sorted.map(k => {
+      const vals = months[k];
+      return +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+    })
+  };
+}
+
+function renderGraph(period) {
+  const store = getStore();
+  let labels = [], data = [];
+
+  if (period === 'week') {
+    const dates = getDatesBack(7);
+    labels = dates.map(d => {
+      const [y,m,day] = d.split('-');
+      const dt = new Date(y, m-1, day);
+      return days[dt.getDay()].slice(0,3);
+    });
+    data = dates.map(d => store[d]?.mood || null);
+  } else if (period === 'month') {
+    const dates = getDatesBack(30);
+    labels = dates.map(d => d.split('-')[2]);
+    data = dates.map(d => store[d]?.mood || null);
+  } else {
+    const r = getWeeklyAvgPerMonth();
+    labels = r.labels; data = r.data;
+  }
+
+  const validData = data.filter(v => v !== null);
+  document.getElementById('statAvg').textContent = validData.length
+    ? (validData.reduce((a,b)=>a+b,0)/validData.length).toFixed(1) : '-';
+  document.getElementById('statHigh').textContent = validData.length ? Math.max(...validData) : '-';
+  document.getElementById('statLow').textContent = validData.length ? Math.min(...validData) : '-';
+
+  const canvas = document.getElementById('moodChart');
+  const ctx = canvas.getContext('2d');
+
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+  if (!validData.length) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#9a8878';
+    ctx.font = '13px Assistant';
+    ctx.textAlign = 'center';
+    ctx.fillText('עוד אין נתונים להצגה', canvas.width/2, canvas.height/2);
+    return;
+  }
+
+  // Draw manually with canvas API
+  const W = canvas.parentElement.clientWidth - 32;
+  const H = canvas.parentElement.clientHeight - 36;
+  canvas.width = W; canvas.height = H;
+
+  const pad = { top: 10, right: 16, bottom: 30, left: 28 };
+  const gW = W - pad.left - pad.right;
+  const gH = H - pad.top - pad.bottom;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid lines
+  for (let i = 1; i <= 9; i += 2) {
+    const y = pad.top + gH - ((i-1)/8)*gH;
+    ctx.strokeStyle = 'rgba(160,140,120,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left+gW, y); ctx.stroke();
+    ctx.fillStyle = '#b0a090';
+    ctx.font = '10px Assistant';
+    ctx.textAlign = 'right';
+    ctx.fillText(i, pad.left - 4, y + 4);
+  }
+
+  const step = gW / (labels.length - 1 || 1);
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top+gH);
+  grad.addColorStop(0, 'rgba(154,171,137,0.35)');
+  grad.addColorStop(1, 'rgba(154,171,137,0.02)');
+
+  // Path
+  ctx.beginPath();
+  let firstPoint = true;
+  labels.forEach((lbl, i) => {
+    const val = data[i];
+    if (val === null) return;
+    const x = pad.left + i * step;
+    const y = pad.top + gH - ((val-1)/8)*gH;
+    if (firstPoint) { ctx.moveTo(x, y); firstPoint = false; }
+    else { ctx.lineTo(x, y); }
+  });
+
+  // Fill
+  const fillPath = new Path2D();
+  firstPoint = true;
+  let lastX = pad.left, firstX = pad.left;
+  labels.forEach((lbl, i) => {
+    const val = data[i];
+    if (val === null) return;
+    const x = pad.left + i * step;
+    const y = pad.top + gH - ((val-1)/8)*gH;
+    if (firstPoint) { fillPath.moveTo(x, y); firstX = x; firstPoint = false; }
+    else fillPath.lineTo(x, y);
+    lastX = x;
+  });
+  fillPath.lineTo(lastX, pad.top+gH);
+  fillPath.lineTo(firstX, pad.top+gH);
+  fillPath.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill(fillPath);
+
+  // Line
+  ctx.strokeStyle = '#9aab89';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Dots + x labels
+  labels.forEach((lbl, i) => {
+    const val = data[i];
+    const x = pad.left + i * step;
+
+    // x label (show every nth)
+    const nth = period === 'month' ? 5 : 1;
+    if (i % nth === 0) {
+      ctx.fillStyle = '#b0a090';
+      ctx.font = '10px Assistant';
+      ctx.textAlign = 'center';
+      ctx.fillText(lbl, x, pad.top+gH+18);
+    }
+
+    if (val === null) return;
+    const y = pad.top + gH - ((val-1)/8)*gH;
+    ctx.beginPath();
+    ctx.arc(x, y, period === 'month' ? 3 : 5, 0, Math.PI*2);
+    ctx.fillStyle = moodColors[Math.round(val)] || '#9aab89';
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Value label on dots (week only)
+    if (period === 'week') {
+      ctx.fillStyle = '#6b5d50';
+      ctx.font = 'bold 11px Assistant';
+      ctx.textAlign = 'center';
+      ctx.fillText(val, x, y - 10);
+    }
+  });
+}
+
+// ─── Init ────────────────────────────────────────────────
+loadDay();
+setTimeout(() => renderGraph('week'), 100);
+
+// Auto-save on blur
+document.querySelectorAll('.journal-input, .hour-input').forEach(el => {
+  el.addEventListener('blur', () => {
+    const store = getStore();
+    const day = store[todayKey] || {};
+    if (el.id) day[el.id] = el.value;
+    store[todayKey] = day;
+    setStore(store);
+  });
+});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+</script>
+</body>
+</html>
