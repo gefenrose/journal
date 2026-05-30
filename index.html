@@ -1010,6 +1010,159 @@
   }
   .header-menu-btn:active { background: rgba(255,255,255,0.35); }
 
+
+  /* ── Fortune Cookie ── */
+  .fortune-card {
+    background: linear-gradient(135deg, #f5efe3 0%, #ede4d4 100%);
+    border-radius: 24px;
+    padding: 0;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(100,80,60,0.1);
+    border: 1px solid rgba(200,180,150,0.4);
+    overflow: hidden;
+    position: relative;
+  }
+  .fortune-inner {
+    padding: 20px 20px 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .fortune-card::before {
+    content: '🥠';
+    position: absolute;
+    top: -8px; left: 14px;
+    font-size: 56px;
+    opacity: 0.13;
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
+  .fortune-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--clay);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .fortune-text {
+    font-family: 'Secular One', sans-serif;
+    font-size: 17px;
+    color: var(--text-dark);
+    line-height: 1.55;
+    min-height: 52px;
+    transition: opacity 0.4s;
+  }
+  .fortune-text.fading { opacity: 0; }
+  .fortune-sub {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 8px;
+    font-style: italic;
+  }
+  .fortune-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(200,180,150,0.3);
+  }
+  .fortune-btn {
+    flex: 1;
+    padding: 9px 8px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .fortune-btn:active { transform: scale(0.96); }
+  .fortune-btn.refresh-btn {
+    background: rgba(154,171,137,0.18);
+    color: var(--sage-dark);
+  }
+  .fortune-btn.export-btn {
+    background: rgba(196,133,90,0.15);
+    color: var(--clay-dark);
+  }
+  /* Export canvas (hidden) */
+  #fortuneExportCanvas { display: none; }
+
+  /* Share toast with image preview */
+  .fortune-share-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: rgba(58,48,40,0.55);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .fortune-share-popup.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .fortune-share-sheet {
+    width: 100%;
+    max-width: 430px;
+    background: var(--warm-white);
+    border-radius: 24px 24px 0 0;
+    padding: 20px 20px 40px;
+    transform: translateY(40px);
+    transition: transform 0.3s cubic-bezier(0.34,1.3,0.64,1);
+  }
+  .fortune-share-popup.open .fortune-share-sheet {
+    transform: translateY(0);
+  }
+  .fortune-share-preview {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(100,80,60,0.15);
+    margin-bottom: 16px;
+  }
+  .fortune-share-title {
+    font-family: 'Secular One', sans-serif;
+    font-size: 17px;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .fortune-share-btns {
+    display: flex;
+    gap: 10px;
+  }
+  .fortune-share-action {
+    flex: 1;
+    padding: 13px;
+    border-radius: 16px;
+    border: none;
+    font-family: 'Assistant', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .fortune-share-action.primary {
+    background: var(--sage-dark);
+    color: white;
+  }
+  .fortune-share-action.secondary {
+    background: var(--sand-light);
+    color: var(--text-mid);
+  }
+
 </style>
 </head>
 <body>
@@ -1080,6 +1233,31 @@
 
   <!-- TODAY SECTION -->
   <div class="section active" id="section-today">
+    <!-- Fortune Cookie -->
+    <div class="fortune-card">
+      <div class="fortune-inner">
+        <div class="fortune-label">🥠 עוגיית המזל של היום</div>
+        <div class="fortune-text" id="fortuneText">טוען...</div>
+        <div class="fortune-sub" id="fortuneSub"></div>
+        <div class="fortune-actions">
+          <button class="fortune-btn refresh-btn" onclick="newFortune()">🔀 עוד אחת</button>
+          <button class="fortune-btn export-btn" onclick="exportFortune()">📸 ייצא תמונה</button>
+        </div>
+      </div>
+    </div>
+    <canvas id="fortuneExportCanvas"></canvas>
+    <!-- Fortune share popup -->
+    <div class="fortune-share-popup" id="fortuneSharePopup">
+      <div class="fortune-share-sheet">
+        <div class="fortune-share-title">שתפי את עוגיית המזל 🥠</div>
+        <img class="fortune-share-preview" id="fortuneSharePreview" src="" alt="">
+        <div class="fortune-share-btns">
+          <button class="fortune-share-action primary" onclick="downloadFortune()">⬇️ הורד תמונה</button>
+          <button class="fortune-share-action secondary" onclick="closeFortune()">סגור</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Gratitude -->
     <div class="card">
       <div class="card-title"><span class="icon">🌸</span> שלושה דברים שאני אסיר/ה תודה עליהם</div>
@@ -1929,6 +2107,240 @@ function closeDrawer() {
   }, { passive: true });
 })();
 
+
+// ── Fortune Cookie ───────────────────────────────────────
+const FORTUNES = [
+  { text: "הדרך לאושר עוברת דרך המקרר. לפחות זו הדרך הקצרה.", sub: "חוכמת הקדמונים (והרעבים)" },
+  { text: "אדם שמחייך כל הזמן או שמאושר מאוד — או שיש לו WiFi חינם.", sub: "תאוריה אבולוציונית" },
+  { text: "כוס קפה אחת ביום מרחיקה את הרופא. עשר כוסות מרחיקות את כולם.", sub: "מדע שאישרנו לבד" },
+  { text: "בעוד עשר שנים תצחקי על הדאגות שלך היום. אז למה לחכות?", sub: "חיסכון בזמן צחוק" },
+  { text: "המוח האנושי פועל 24/7 — חוץ מזמן מבחנים ורגעים חשובים.", sub: "מחקר אוניברסיטת המיטה" },
+  { text: "כישרון זה עבודה קשה שמישהו אחר עבד בשבילה.", sub: "אמרה שלא ייחסו לאיש" },
+  { text: "יום חדש, הזדמנות חדשה לשכוח מה רצית לעשות אתמול.", sub: "ניהול זמן מתקדם" },
+  { text: "הצלחה היא 1% השראה ו-99% סיבה לא לישון.", sub: "אדיסון, מהדורה מעודכנת" },
+  { text: "לא כל מחשבה שעולה לך ראויה לפרסום. חלקן ראויות רק לבלוג.", sub: "עצת עריכה מקצועית" },
+  { text: "עץ שנפל ביער ואין מי שישמע — עדיין עושה רעש. בדיוק כמו ההתראות שלך.", sub: "פיזיקה ומעשיות" },
+  { text: "אם תדחה דברים מספיק זמן, חלקם פותרים את עצמם. השאר הופכים לחרום.", sub: "ניהול סיכונים יצירתי" },
+  { text: "שנה רגל שמאל ותגלה כמה אתה מוכשר ברגל ימין.", sub: "גמישות מחשבתית" },
+  { text: "אנשים שאומרים 'שנה שעה' כנראה לא ידעו כמה שנות שעה יש.", sub: "תצפית חברתית" },
+  { text: "הסוד לאריכות ימים: לא להיות מת. פשוט כפי שנשמע.", sub: "רפואה פרקטית" },
+  { text: "לפעמים הפתרון הטוב ביותר הוא לישון על זה. לפעמים זו רק עייפות.", sub: "פסיכולוגיה שימושית" },
+  { text: "טעות חד-פעמית היא לימוד. טעות חוזרת היא אישיות.", sub: "בניית זהות 101" },
+  { text: "אין 'אני לא יכול' — יש 'אני לא רוצה' ויש 'כבר ניסיתי וזה לא עבד אף פעם'.", sub: "אימון מנטלי" },
+  { text: "הימים הטובים ביותר הם אלה שאתה זוכר שכח לדאוג.", sub: "ממצאי שכחה מחקרית" },
+  { text: "חוכמה אמיתית היא לדעת מה לא לחפש בגוגל.", sub: "כלל האינטרנט הראשון" },
+  { text: "השראה מגיעה כשמתחילים לעבוד. לרוב מגיעה כשכבר מאוחר מדי להשתמש בה.", sub: "ניהול קריאייטיב" },
+  { text: "כל בוקר הוא הזדמנות חדשה. כל ערב הוא ראיה ריאלית של מה עשית ממנה.", sub: "יומן ביקורת עצמית" },
+  { text: "אנשים שתמיד מגיעים בזמן סתם לא בדקו עוד פעם אחת את הטלפון.", sub: "סוציולוגיה של הפיגורים" },
+  { text: "הצלחה ללא עבודה קשה היא כמו חיפוש WiFi ללא סיסמה — קורה לפעמים, אבל אל תסמכי על זה.", sub: "אמינות רשתות" },
+  { text: "היום יכול להיות היום הטוב ביותר בחייך. אבל גם לא. לפחות יש קפה.", sub: "אופטימיזם מינימלי" },
+  { text: "לכל בעיה יש פתרון פשוט, ברור ושגוי. ולפחות עוד שישה מורכבים.", sub: "הנדסת פתרונות" },
+  { text: "המוח זוכר פנים אבל שוכח שמות. לכן ממציאים כינויים.", sub: "מנגנוני הסתגלות" },
+  { text: "לישון מוקדם זו החלטה שמתקבלת בחצות ונשכחת בשתיים.", sub: "תוכנית ערב אופטימיסטית" },
+  { text: "אם לא תכלול את הרגע הזה ביומן, הוא עדיין קרה. אבל עם פחות תיעוד.", sub: "פילוסופיה של הכתיבה" },
+  { text: "פרפקציוניזם הוא הסיבה שיש לך רשימות To-Do ארוכות ותיקיית 'טיוטות' מלאה.", sub: "ניהול משימות אמיתי" },
+  { text: "הצום הבא שלך מתחיל אחרי הנשנוש הזה.", sub: "תזונה בזמן אמת" },
+];
+
+let todayFortune = null;
+let fortuneImageUrl = null;
+
+function getDailyFortune() {
+  const store = window.getStore ? window.getStore() : {};
+  const key = currentKey ? currentKey() : todayKey ? todayKey() : 'today';
+  const saved = store[key]?.fortune;
+  if (saved !== undefined) return saved;
+  // deterministic index from date
+  const d = key.split('-').join('');
+  const idx = parseInt(d) % FORTUNES.length;
+  return idx;
+}
+
+function saveFortune(idx) {
+  const store = window.getStore ? window.getStore() : {};
+  const key = currentKey ? currentKey() : 'today';
+  const day = store[key] || {};
+  day.fortune = idx;
+  store[key] = day;
+  if (window.setStore) window.setStore(store);
+}
+
+function renderFortune(idx) {
+  const f = FORTUNES[idx];
+  const el = document.getElementById('fortuneText');
+  const sub = document.getElementById('fortuneSub');
+  if (!el) return;
+  el.classList.add('fading');
+  setTimeout(() => {
+    el.textContent = f.text;
+    sub.textContent = '— ' + f.sub;
+    el.classList.remove('fading');
+  }, 300);
+  todayFortune = idx;
+}
+
+function initFortune() {
+  const idx = getDailyFortune();
+  renderFortune(idx);
+  todayFortune = idx;
+}
+
+function newFortune() {
+  let idx;
+  do { idx = Math.floor(Math.random() * FORTUNES.length); }
+  while (idx === todayFortune);
+  saveFortune(idx);
+  renderFortune(idx);
+}
+
+function exportFortune() {
+  const f = FORTUNES[todayFortune];
+  const canvas = document.getElementById('fortuneExportCanvas');
+  const W = 1080, H = 1080;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#f5efe3');
+  grad.addColorStop(0.5, '#ede4d4');
+  grad.addColorStop(1, '#e4d8c4');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  roundRect(ctx, 0, 0, W, H, 0);
+  ctx.fill();
+
+  // Subtle texture dots
+  ctx.fillStyle = 'rgba(180,155,120,0.06)';
+  for (let x = 30; x < W; x += 40) {
+    for (let y = 30; y < H; y += 40) {
+      ctx.beginPath();
+      ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Decorative border
+  ctx.strokeStyle = 'rgba(196,133,90,0.25)';
+  ctx.lineWidth = 3;
+  roundRect(ctx, 28, 28, W - 56, H - 56, 32);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(196,133,90,0.1)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, 38, 38, W - 76, H - 76, 26);
+  ctx.stroke();
+
+  // Big cookie emoji
+  ctx.font = '200px serif';
+  ctx.textAlign = 'center';
+  ctx.globalAlpha = 0.12;
+  ctx.fillText('🥠', W / 2, H / 2 + 80);
+  ctx.globalAlpha = 1;
+
+  // Label
+  ctx.font = 'bold 36px Arial';
+  ctx.fillStyle = '#c4855a';
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '3px';
+  ctx.fillText('✦  עוגיית המזל  ✦', W / 2, 140);
+
+  // Fortune text (wrapped)
+  ctx.font = 'bold 58px Arial';
+  ctx.fillStyle = '#3a3028';
+  ctx.textAlign = 'center';
+  const lines = wrapText(ctx, f.text, W - 160);
+  const lineH = 78;
+  const totalH = lines.length * lineH;
+  const startY = (H - totalH) / 2 - 40;
+  lines.forEach((line, i) => {
+    ctx.fillText(line, W / 2, startY + i * lineH);
+  });
+
+  // Sub text
+  ctx.font = 'italic 34px Arial';
+  ctx.fillStyle = '#9a8878';
+  ctx.fillText('— ' + f.sub, W / 2, startY + lines.length * lineH + 60);
+
+  // Date
+  const d = new Date();
+  const dateStr = `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+  ctx.font = '28px Arial';
+  ctx.fillStyle = 'rgba(154,136,120,0.6)';
+  ctx.fillText(dateStr, W / 2, H - 70);
+
+  fortuneImageUrl = canvas.toDataURL('image/png');
+  const preview = document.getElementById('fortuneSharePreview');
+  preview.src = fortuneImageUrl;
+
+  const popup = document.getElementById('fortuneSharePopup');
+  popup.classList.add('open');
+
+  // Try native share if available
+  if (navigator.share && navigator.canShare) {
+    canvas.toBlob(async blob => {
+      const file = new File([blob], 'fortune.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: 'עוגיית המזל שלי 🥠' });
+          closeFortune();
+          return;
+        } catch(e) { /* user cancelled or not supported, show sheet */ }
+      }
+      popup.classList.add('open');
+    });
+  }
+}
+
+function downloadFortune() {
+  if (!fortuneImageUrl) return;
+  const a = document.createElement('a');
+  a.href = fortuneImageUrl;
+  a.download = 'fortune-cookie.png';
+  a.click();
+  closeFortune();
+}
+
+function closeFortune() {
+  document.getElementById('fortuneSharePopup').classList.remove('open');
+}
+
+function wrapText(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let current = '';
+  for (const word of words) {
+    const test = current ? current + ' ' + word : word;
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// Close fortune popup on outside click
+document.addEventListener('click', e => {
+  const popup = document.getElementById('fortuneSharePopup');
+  if (popup && e.target === popup) closeFortune();
+});
+
 // ── PIN / Lock ──────────────────────────────────────────
 const PIN_KEY = 'journal_pin';
 const SESSION_KEY = 'journal_unlocked';
@@ -2079,6 +2491,7 @@ initLock();
 // ─── Init ────────────────────────────────────────────────
 function initApp() {
   loadDay();
+  initFortune();
   setTimeout(() => renderGraph('week'), 100);
 
   // Auto-save on blur
@@ -2111,11 +2524,20 @@ if ('serviceWorker' in navigator && location.protocol === 'https:' && !location.
 
 <script type="module">
 // ── Firebase Cloud Sync ──────────────────────────────────
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+// Stubs defined immediately so onclick handlers never get ReferenceError
+window.firebaseSignIn    = () => window._fbSignIn?.();
+window.firebaseSignOut   = () => window._fbSignOut?.();
+window.manualCloudSync   = () => window._fbSync?.();
+window.restoreFromCloud  = () => window._fbRestore?.();
+
+const [ { initializeApp },
+        { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged },
+        { getFirestore, doc, setDoc, collection, getDocs }
+] = await Promise.all([
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'),
+]);
 
 const firebaseConfig = {
   apiKey: "AIzaSyDjUYvdYXvseu1B0LlLctOHtZVcORuAEhM",
@@ -2134,6 +2556,64 @@ const provider = new GoogleAuthProvider();
 let currentUser = null;
 let syncTimeout = null;
 
+// Handle redirect result on page load (after Google redirects back)
+// Shared function to update UI and sync when a user is available
+async function handleUser(user) {
+  if (!user) return;
+  currentUser = user;
+  const loginArea = document.getElementById('firebaseLoginArea');
+  const userArea  = document.getElementById('firebaseUserArea');
+  if (loginArea) loginArea.style.display = 'none';
+  if (userArea)  userArea.style.display  = 'block';
+  const nameEl   = document.getElementById('firebaseUserName');
+  const emailEl  = document.getElementById('firebaseUserEmail');
+  const avatarEl = document.getElementById('firebaseAvatar');
+  if (nameEl)  nameEl.textContent  = user.displayName || 'משתמש';
+  if (emailEl) emailEl.textContent = user.email || '';
+  if (avatarEl && user.photoURL)
+    avatarEl.innerHTML = `<img src="${user.photoURL}" alt="">`;
+  setCloudStatus('syncing', 'מסנכרן...');
+  try {
+    const snap = await getDocs(collection(db, 'users', user.uid, 'journal'));
+    const local = window.getStore ? window.getStore() : {};
+    let changed = false;
+    snap.forEach(d => {
+      const cloudDay = d.data();
+      if (!local[d.id]) { local[d.id] = cloudDay; changed = true; }
+      else {
+        Object.keys(cloudDay).forEach(k => {
+          if (!local[d.id][k] && cloudDay[k]) { local[d.id][k] = cloudDay[k]; changed = true; }
+        });
+      }
+    });
+    if (changed) {
+      if (window.setStore)    window.setStore(local);
+      if (window.loadDay)     window.loadDay();
+      if (window.renderGraph) window.renderGraph(window.currentPeriod || 'week');
+    }
+    setCloudStatus('synced', 'מסונכרן ✓');
+    await pushToCloud(false);
+  } catch(e) {
+    console.error('Sync after login error:', e);
+    setCloudStatus('error', 'שגיאת סנכרון');
+    setTimeout(() => setCloudStatus('synced', 'מחובר'), 4000);
+  }
+}
+
+// On page load — check if we just came back from a Google redirect
+getRedirectResult(auth).then(result => {
+  if (result?.user) {
+    console.log('Redirect result user:', result.user.email);
+    handleUser(result.user);
+  }
+}).catch(e => {
+  console.error('getRedirectResult error:', e.code, e.message);
+  if (e.code && e.code !== 'auth/no-auth-event') {
+    setCloudStatus('error', e.code);
+    setTimeout(() => setCloudStatus('offline', 'לא מחובר'), 5000);
+  }
+});
+
 function setCloudStatus(state, text) {
   const el = document.getElementById('cloudStatus');
   const txt = document.getElementById('cloudStatusText');
@@ -2142,29 +2622,48 @@ function setCloudStatus(state, text) {
   txt.textContent = text;
 }
 
-// Expose functions to global scope for onclick handlers
-window.firebaseSignIn = async () => {
+// Wire real implementations
+window._fbSignIn = async () => {
+  setCloudStatus('syncing', 'מתחבר...');
+  // Try popup first (works on most Android Chrome), fall back to redirect
   try {
-    setCloudStatus('syncing', 'מתחבר...');
-    await signInWithPopup(auth, provider);
-  } catch (e) {
-    console.error('Login error:', e);
-    setCloudStatus('error', 'שגיאת התחברות');
-    setTimeout(() => setCloudStatus('offline', 'לא מחובר'), 3000);
+    console.log('Trying signInWithPopup...');
+    const { signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const result = await signInWithPopup(auth, provider);
+    console.log('Popup sign-in success:', result.user.email);
+    // onAuthStateChanged will handle the rest
+  } catch (popupErr) {
+    console.warn('Popup failed:', popupErr.code, '— trying redirect...');
+    if (popupErr.code === 'auth/popup-blocked' ||
+        popupErr.code === 'auth/popup-closed-by-user' ||
+        popupErr.code === 'auth/cancelled-popup-request' ||
+        popupErr.code === 'auth/operation-not-supported-in-this-environment') {
+      try {
+        await signInWithRedirect(auth, provider);
+      } catch (redirErr) {
+        console.error('Redirect also failed:', redirErr.code, redirErr.message);
+        setCloudStatus('error', redirErr.code || 'שגיאת התחברות');
+        setTimeout(() => setCloudStatus('offline', 'לא מחובר'), 5000);
+      }
+    } else {
+      console.error('Popup error:', popupErr.code, popupErr.message);
+      setCloudStatus('error', popupErr.code || 'שגיאת התחברות');
+      setTimeout(() => setCloudStatus('offline', 'לא מחובר'), 5000);
+    }
   }
 };
 
-window.firebaseSignOut = async () => {
+window._fbSignOut = async () => {
   await signOut(auth);
   setCloudStatus('offline', 'לא מחובר');
 };
 
-window.manualCloudSync = async () => {
+window._fbSync = async () => {
   if (!currentUser) return;
   await pushToCloud(true);
 };
 
-window.restoreFromCloud = async () => {
+window._fbRestore = async () => {
   if (!currentUser) return;
   setCloudStatus('syncing', 'משחזר...');
   try {
@@ -2209,56 +2708,18 @@ window.scheduleCloudSync = () => {
   syncTimeout = setTimeout(() => pushToCloud(false), 2000);
 };
 
-// Auth state listener
+// Auth state listener — fires on popup sign-in and on page reload when already signed in
 onAuthStateChanged(auth, async user => {
-  currentUser = user;
-  const loginArea = document.getElementById('firebaseLoginArea');
-  const userArea = document.getElementById('firebaseUserArea');
-
   if (user) {
-    // Update UI
-    if (loginArea) loginArea.style.display = 'none';
-    if (userArea) userArea.style.display = 'block';
-    const nameEl = document.getElementById('firebaseUserName');
-    const emailEl = document.getElementById('firebaseUserEmail');
-    const avatarEl = document.getElementById('firebaseAvatar');
-    if (nameEl) nameEl.textContent = user.displayName || 'משתמש';
-    if (emailEl) emailEl.textContent = user.email || '';
-    if (avatarEl && user.photoURL) {
-      avatarEl.innerHTML = `<img src="${user.photoURL}" alt="">`;
-    }
-    setCloudStatus('syncing', 'מסנכרן...');
-
-    // Merge cloud → local on login
-    try {
-      const snap = await getDocs(collection(db, 'users', user.uid, 'journal'));
-      const local = window.getStore ? window.getStore() : {};
-      let changed = false;
-      snap.forEach(d => {
-        const cloudDay = d.data();
-        if (!local[d.id]) { local[d.id] = cloudDay; changed = true; }
-        else {
-          // Merge: cloud wins for fields that are empty locally
-          Object.keys(cloudDay).forEach(k => {
-            if (!local[d.id][k] && cloudDay[k]) { local[d.id][k] = cloudDay[k]; changed = true; }
-          });
-        }
-      });
-      if (changed) {
-        if (window.setStore) window.setStore(local);
-        if (window.loadDay) window.loadDay();
-        if (window.renderGraph) window.renderGraph(window.currentPeriod || 'week');
-      }
-      setCloudStatus('synced', 'מסונכרן ✓');
-      // Also push local to cloud
-      await pushToCloud(false);
-    } catch(e) {
-      console.error(e);
-      setCloudStatus('error', 'שגיאת סנכרון');
-    }
+    // Already handled by getRedirectResult for redirect flow;
+    // handleUser is idempotent so safe to call again for popup / persistent session
+    await handleUser(user);
   } else {
+    currentUser = null;
+    const loginArea = document.getElementById('firebaseLoginArea');
+    const userArea  = document.getElementById('firebaseUserArea');
     if (loginArea) loginArea.style.display = 'block';
-    if (userArea) userArea.style.display = 'none';
+    if (userArea)  userArea.style.display  = 'none';
     setCloudStatus('offline', 'לא מחובר');
   }
 });
