@@ -2363,7 +2363,7 @@ function exportFortune() {
   // Sub text — fix order: for English show "sub —", for Hebrew "— sub"
   ctx.font = 'italic 34px Arial';
   ctx.fillStyle = '#9a8878';
-  const subText = isEnExport ? f.sub + ' —' : '— ' + f.sub;
+  const subText = '— ' + f.sub;
   ctx.fillText(subText, W / 2, startY + lines.length * lineH + 60);
 
   // Date
