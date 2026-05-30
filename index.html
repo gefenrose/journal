@@ -1282,7 +1282,7 @@
     <!-- Fortune share popup -->
     <div class="fortune-share-popup" id="fortuneSharePopup">
       <div class="fortune-share-sheet">
-        <div class="fortune-share-title">שתפי את עוגיית המזל 🥠</div>
+        <div class="fortune-share-title" id="fortuneShareTitle">שתפי את עוגיית המזל 🥠</div>
         <img class="fortune-share-preview" id="fortuneSharePreview" src="" alt="">
         <div class="fortune-share-btns">
           <button class="fortune-share-action primary" onclick="downloadFortune()">⬇️ הורד תמונה</button>
@@ -2336,14 +2336,19 @@ function exportFortune() {
   ctx.fillText('🥠', W / 2, H / 2 + 80);
   ctx.globalAlpha = 1;
 
+  const isEnExport = fortuneLang === 'en';
+  // Set canvas text direction
+  ctx.direction = isEnExport ? 'ltr' : 'rtl';
+
   // Label
   ctx.font = 'bold 36px Arial';
   ctx.fillStyle = '#c4855a';
   ctx.textAlign = 'center';
   ctx.letterSpacing = '3px';
-  ctx.fillText('✦  עוגיית המזל  ✦', W / 2, 140);
+  ctx.fillText(isEnExport ? '✦  Fortune Cookie  ✦' : '✦  עוגיית המזל  ✦', W / 2, 140);
+  ctx.letterSpacing = '0px';
 
-  // Fortune text (wrapped)
+  // Fortune text (wrapped, LTR for English)
   ctx.font = 'bold 58px Arial';
   ctx.fillStyle = '#3a3028';
   ctx.textAlign = 'center';
@@ -2355,10 +2360,11 @@ function exportFortune() {
     ctx.fillText(line, W / 2, startY + i * lineH);
   });
 
-  // Sub text
+  // Sub text — fix order: for English show "sub —", for Hebrew "— sub"
   ctx.font = 'italic 34px Arial';
   ctx.fillStyle = '#9a8878';
-  ctx.fillText('— ' + f.sub, W / 2, startY + lines.length * lineH + 60);
+  const subText = isEnExport ? f.sub + ' —' : '— ' + f.sub;
+  ctx.fillText(subText, W / 2, startY + lines.length * lineH + 60);
 
   // Date
   const d = new Date();
@@ -2370,6 +2376,12 @@ function exportFortune() {
   fortuneImageUrl = canvas.toDataURL('image/png');
   const preview = document.getElementById('fortuneSharePreview');
   preview.src = fortuneImageUrl;
+
+  // Update share sheet title based on language
+  const shareTitleEl = document.getElementById('fortuneShareTitle');
+  if (shareTitleEl) shareTitleEl.textContent = fortuneLang === 'en'
+    ? 'Share your Fortune Cookie 🥠'
+    : 'שתפי את עוגיית המזל 🥠';
 
   const popup = document.getElementById('fortuneSharePopup');
   popup.classList.add('open');
