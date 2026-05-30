@@ -1163,6 +1163,35 @@
     color: var(--text-mid);
   }
 
+
+  /* Fortune language toggle */
+  .fortune-lang-toggle {
+    display: flex;
+    background: rgba(0,0,0,0.07);
+    border-radius: 20px;
+    padding: 3px;
+    gap: 2px;
+    margin-bottom: 12px;
+    width: fit-content;
+  }
+  .fortune-lang-btn {
+    padding: 4px 14px;
+    border: none;
+    border-radius: 16px;
+    font-family: 'Assistant', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-light);
+    transition: all 0.2s;
+  }
+  .fortune-lang-btn.active {
+    background: white;
+    color: var(--clay-dark);
+    box-shadow: 0 1px 4px rgba(100,80,60,0.15);
+  }
+
 </style>
 </head>
 <body>
@@ -1236,11 +1265,15 @@
     <!-- Fortune Cookie -->
     <div class="fortune-card">
       <div class="fortune-inner">
-        <div class="fortune-label">🥠 עוגיית המזל של היום</div>
+        <div class="fortune-label">🥠 <span id="fortuneLabel">עוגיית המזל של היום</span></div>
+        <div class="fortune-lang-toggle">
+          <button class="fortune-lang-btn active" id="langHe" onclick="setFortuneLang('he')">עב</button>
+          <button class="fortune-lang-btn" id="langEn" onclick="setFortuneLang('en')">EN</button>
+        </div>
         <div class="fortune-text" id="fortuneText">טוען...</div>
         <div class="fortune-sub" id="fortuneSub"></div>
         <div class="fortune-actions">
-          <button class="fortune-btn refresh-btn" onclick="newFortune()">🔀 עוד אחת</button>
+          <button class="fortune-btn refresh-btn" id="fortuneRefreshBtn" onclick="newFortune()">🔀 עוד אחת</button>
           <button class="fortune-btn export-btn" onclick="exportFortune()">📸 ייצא תמונה</button>
         </div>
       </div>
@@ -2109,7 +2142,7 @@ function closeDrawer() {
 
 
 // ── Fortune Cookie ───────────────────────────────────────
-const FORTUNES = [
+const FORTUNES_HE = [
   { text: "הדרך לאושר עוברת דרך המקרר. לפחות זו הדרך הקצרה.", sub: "חוכמת הקדמונים (והרעבים)" },
   { text: "אדם שמחייך כל הזמן או שמאושר מאוד — או שיש לו WiFi חינם.", sub: "תאוריה אבולוציונית" },
   { text: "כוס קפה אחת ביום מרחיקה את הרופא. עשר כוסות מרחיקות את כולם.", sub: "מדע שאישרנו לבד" },
@@ -2142,6 +2175,42 @@ const FORTUNES = [
   { text: "הצום הבא שלך מתחיל אחרי הנשנוש הזה.", sub: "תזונה בזמן אמת" },
 ];
 
+const FORTUNES_EN = [
+  { text: "The path to happiness goes through the fridge. At least it's the shortest route.", sub: "Ancient wisdom (of the hungry)" },
+  { text: "A person who smiles all the time is either very happy — or has free WiFi.", sub: "Evolutionary theory" },
+  { text: "One cup of coffee a day keeps the doctor away. Ten cups keep everyone away.", sub: "Self-certified science" },
+  { text: "In ten years you'll laugh at today's worries. So why wait?", sub: "Advanced time-saving" },
+  { text: "The human brain runs 24/7 — except during exams and important moments.", sub: "University of Pillow research" },
+  { text: "Talent is hard work that someone else did for you.", sub: "A quote no one claimed" },
+  { text: "New day, new opportunity to forget what you wanted to do yesterday.", sub: "Advanced time management" },
+  { text: "Success is 1% inspiration and 99% reasons not to sleep.", sub: "Edison, updated edition" },
+  { text: "Not every thought that pops up deserves publishing. Some only deserve a blog.", sub: "Professional editing advice" },
+  { text: "A tree that falls in the forest still makes noise. Just like your notifications.", sub: "Physics and fables" },
+  { text: "Procrastinate long enough and some problems solve themselves. The rest become emergencies.", sub: "Creative risk management" },
+  { text: "Change your left foot and discover how talented your right one is.", sub: "Mental flexibility" },
+  { text: "People who are always on time just didn't check their phone one last time.", sub: "Sociology of tardiness" },
+  { text: "The secret to longevity: don't die. Simple as it sounds.", sub: "Practical medicine" },
+  { text: "Sometimes the best solution is to sleep on it. Sometimes that's just tiredness.", sub: "Applied psychology" },
+  { text: "A one-time mistake is a lesson. A recurring one is a personality.", sub: "Identity building 101" },
+  { text: "There's no 'I can't' — only 'I don't want to' and 'I tried and it never worked'.", sub: "Mental coaching" },
+  { text: "The best days are the ones you forgot to worry.", sub: "Forgetting research findings" },
+  { text: "True wisdom is knowing what NOT to Google.", sub: "Rule one of the internet" },
+  { text: "Inspiration comes when you start working. Usually too late to use it.", sub: "Creative management" },
+  { text: "Every morning is a fresh start. Every evening is a reality check on what you did with it.", sub: "Self-criticism journal" },
+  { text: "Perfectionists have long To-Do lists and a very full 'Drafts' folder.", sub: "Real task management" },
+  { text: "Your next diet starts after this snack.", sub: "Real-time nutrition" },
+  { text: "Success without hard work is like finding WiFi without a password — it happens, but don't count on it.", sub: "Network reliability" },
+  { text: "Today could be the best day of your life. Or not. At least there's coffee.", sub: "Minimal optimism" },
+  { text: "Every problem has a simple, obvious, and wrong solution. Plus at least six complicated ones.", sub: "Solution engineering" },
+  { text: "The brain remembers faces but forgets names. Hence: nicknames.", sub: "Adaptation mechanisms" },
+  { text: "Going to bed early is a decision made at midnight and forgotten by two.", sub: "Optimistic evening plan" },
+  { text: "If you don't put this moment in your journal, it still happened. Just with less documentation.", sub: "Philosophy of writing" },
+  { text: "A new week is just seven more chances to reschedule what you postponed last week.", sub: "Weekly planning, realistic edition" },
+];
+
+let fortuneLang = localStorage.getItem('fortuneLang') || 'he';
+function FORTUNES() { return fortuneLang === 'en' ? FORTUNES_EN : FORTUNES_HE; }
+
 let todayFortune = null;
 let fortuneImageUrl = null;
 
@@ -2152,7 +2221,7 @@ function getDailyFortune() {
   if (saved !== undefined) return saved;
   // deterministic index from date
   const d = key.split('-').join('');
-  const idx = parseInt(d) % FORTUNES.length;
+  const idx = parseInt(d) % FORTUNES().length;
   return idx;
 }
 
@@ -2166,7 +2235,7 @@ function saveFortune(idx) {
 }
 
 function renderFortune(idx) {
-  const f = FORTUNES[idx];
+  const f = FORTUNES()[idx];
   const el = document.getElementById('fortuneText');
   const sub = document.getElementById('fortuneSub');
   if (!el) return;
@@ -2181,20 +2250,50 @@ function renderFortune(idx) {
 
 function initFortune() {
   const idx = getDailyFortune();
+  // Restore saved language preference
+  fortuneLang = localStorage.getItem('fortuneLang') || 'he';
+  const isHe = fortuneLang === 'he';
+  const langHe = document.getElementById('langHe');
+  const langEn = document.getElementById('langEn');
+  if (langHe) langHe.classList.toggle('active', isHe);
+  if (langEn) langEn.classList.toggle('active', !isHe);
+  const labelEl = document.getElementById('fortuneLabel');
+  if (labelEl) labelEl.textContent = isHe ? 'עוגיית המזל של היום' : "Today's Fortune Cookie";
+  const refreshBtn = document.getElementById('fortuneRefreshBtn');
+  if (refreshBtn) refreshBtn.textContent = isHe ? '🔀 עוד אחת' : '🔀 Another one';
+  const textEl = document.getElementById('fortuneText');
+  if (textEl) textEl.style.direction = isHe ? 'rtl' : 'ltr';
   renderFortune(idx);
   todayFortune = idx;
 }
 
+function setFortuneLang(lang) {
+  fortuneLang = lang;
+  localStorage.setItem('fortuneLang', lang);
+  // Update toggle UI
+  document.getElementById('langHe').classList.toggle('active', lang === 'he');
+  document.getElementById('langEn').classList.toggle('active', lang === 'en');
+  // Update label and button text
+  const isHe = lang === 'he';
+  document.getElementById('fortuneLabel').textContent = isHe ? 'עוגיית המזל של היום' : "Today's Fortune Cookie";
+  document.getElementById('fortuneRefreshBtn').textContent = isHe ? '🔀 עוד אחת' : '🔀 Another one';
+  // Update text direction
+  const textEl = document.getElementById('fortuneText');
+  if (textEl) textEl.style.direction = isHe ? 'rtl' : 'ltr';
+  // Re-render current index in new language
+  renderFortune(todayFortune ?? 0);
+}
+
 function newFortune() {
   let idx;
-  do { idx = Math.floor(Math.random() * FORTUNES.length); }
+  do { idx = Math.floor(Math.random() * FORTUNES().length); }
   while (idx === todayFortune);
   saveFortune(idx);
   renderFortune(idx);
 }
 
 function exportFortune() {
-  const f = FORTUNES[todayFortune];
+  const f = FORTUNES()[todayFortune];
   const canvas = document.getElementById('fortuneExportCanvas');
   const W = 1080, H = 1080;
   canvas.width = W; canvas.height = H;
